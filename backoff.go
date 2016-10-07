@@ -10,9 +10,18 @@ const (
 	http420InitDelay = time.Minute
 )
 
+// Backoff is the interface for stream retries. When an error is encountered,
+// the stream's StreamErrFn will be called (if it exists) with the current
+// Backoff and the sepcific error.
 type Backoff interface {
+	// NextWait returns the duration that the stream will wait before
+	// attempting to reconnect.
 	NextWait() time.Duration
+	// Waited returns the total duration that has been waited (not including
+	// the NextWait duration) since a successful stream was established.
 	Waited() time.Duration
+	// Retries returns the total number of retries since a successful stream
+	// was established.
 	Retries() int
 }
 
