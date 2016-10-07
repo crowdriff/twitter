@@ -85,3 +85,9 @@ func (c *Client) Do(ctx context.Context, method string, creds *Credentials, urlS
 	// Make request.
 	return c.httpClient.Do(req)
 }
+
+// StartFilterStream starts and returns a new Stream using the provided context,
+// stream filter parameters, and optional stream error callback.
+func (c *Client) StartFilterStream(ctx context.Context, params StreamFilterParams, errFn StreamErrFn) *Stream {
+	return newFilterStream(ctx, c, params, errFn)
+}
