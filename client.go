@@ -23,6 +23,8 @@ type OAuthClient interface {
 	Do(ctx context.Context, method string, creds *Credentials, urlStr string, values url.Values) (*http.Response, error)
 }
 
+// HTTPClient is the interface for making HTTP requests. It accepts an HTTP
+// request and returns the corresponding HTTP response or error.
 type HTTPClient interface {
 	Do(*http.Request) (*http.Response, error)
 }
@@ -59,7 +61,7 @@ func NewClient(appCreds Credentials, defaultCreds Credentials, httpClient HTTPCl
 // Do implements the OAuthClient interface. It is used to make an OAuth HTTP
 // request with the provided context, HTTP method, OAuth credentials, URL
 // string, and URL query parameters. It returns the corresponding HTTP response
-// and error.
+// or error.
 func (c *Client) Do(ctx context.Context, method string, creds *Credentials, urlStr string, values url.Values) (*http.Response, error) {
 	// Set credentials.
 	oauthCreds := c.defaultCreds
