@@ -1,0 +1,5 @@
+package: github.com/crowdriff/twitter
+import:
+- package: github.com/garyburd/go-oauth
+  subpackages:
+  - oauth
