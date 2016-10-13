@@ -124,3 +124,60 @@ func userTimelineToQuery(params UserTimelineParams) url.Values {
 	}
 	return values
 }
+
+// HomeTimelineParams represents the query parameters for a
+// /statuses/home_timeline.json request.
+type HomeTimelineParams struct {
+	Count              int    `json:"count"`
+	SinceID            string `json:"since_id"`
+	MaxID              string `json:"max_id"`
+	TrimUser           bool   `json:"trim_user"`
+	ExcludeReplies     bool   `json:"exclude_replies"`
+	ContributorDetails bool   `json:"contributor_details"`
+	ExcludeEntities    bool   `json:"exclude_entities"`
+}
+
+// HomeTimeline calls the Twitter /statuses/home_timeline.json endpoint.
+func (c *Client) HomeTimeline(ctx context.Context, params HomeTimelineParams) (*TweetsResponse, error) {
+	values := homeTimelineToQuery(params)
+	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/statuses/home_timeline.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var tweets []Tweet
+	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &TweetsResponse{
+		Tweets:    tweets,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func homeTimelineToQuery(params HomeTimelineParams) url.Values {
+	values := url.Values{}
+	if params.Count > 0 {
+		values.Set("count", strconv.Itoa(params.Count))
+	}
+	if params.SinceID != "" {
+		values.Set("since_id", params.SinceID)
+	}
+	if params.MaxID != "" {
+		values.Set("max_id", params.MaxID)
+	}
+	if params.TrimUser {
+		values.Set("trim_user", "true")
+	}
+	if params.ExcludeReplies {
+		values.Set("exclude_replies", "true")
+	}
+	if params.ContributorDetails {
+		values.Set("contributor_details", "true")
+	}
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
+	}
+	return values
+}
