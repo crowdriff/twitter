@@ -25,7 +25,7 @@ coverage:
 	@ginkgo -cover -r -v
 
 deps:
-	@go get github.com/garyburd/go-oauth
+	@go get github.com/garyburd/go-oauth/oauth
 
 test:
 	@ginkgo -r -cover -race
