@@ -77,8 +77,8 @@ type DestroyDirectMessageParams struct {
 	ExcludeEntities bool
 }
 
-// DestroyDirectMessages calls the Twitter /direct_messages/destroy.json endpoint.
-func (c *Client) DestroyDirectMessages(ctx context.Context, params DestroyDirectMessageParams) (*DirectMessageResponse, error) {
+// DestroyDirectMessage calls the Twitter /direct_messages/destroy.json endpoint.
+func (c *Client) DestroyDirectMessage(ctx context.Context, params DestroyDirectMessageParams) (*DirectMessageResponse, error) {
 	values := url.Values{}
 	if params.ID != "" {
 		values.Set("id", params.ID)
@@ -87,6 +87,28 @@ func (c *Client) DestroyDirectMessages(ctx context.Context, params DestroyDirect
 		values.Set("include_entities", "false")
 	}
 	resp, err := c.do(ctx, "POST", "https://api.twitter.com/1.1/direct_messages/destroy.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var directMessage DirectMessage
+	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &DirectMessageResponse{
+		DirectMessage: directMessage,
+		RateLimit:     getRateLimit(resp.Header),
+	}, nil
+}
+
+// ShowDirectMessage calls the Twitter /direct_messages/show.json endpoint.
+func (c *Client) ShowDirectMessage(ctx context.Context, directMessageID string) (*DirectMessageResponse, error) {
+	values := url.Values{}
+	if directMessageID != "" {
+		values.Set("id", directMessageID)
+	}
+	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/direct_messages/show.json", values)
 	if err != nil {
 		return nil, err
 	}
