@@ -196,3 +196,20 @@ type User struct {
 	WithheldInCountries            string   `json:"withheld_in_countries"`
 	WithheldScope                  string   `json:"withheld_scope"`
 }
+
+type Configuration struct {
+	CharactersReservedPerMedia int                  `json:"characters_reserved_per_media"`
+	DMTextCharacterLimit       int                  `json:"dm_text_character_limit"`
+	MaxMediaPerUpload          int                  `json:"max_media_per_upload"`
+	PhotoSizeLimit             int                  `json:"photo_size_limit"`
+	PhotoSizes                 map[string]PhotoSize `json:"photo_sizes"`
+	ShortURLLength             int                  `json:"short_url_length"`
+	ShortURLLengthHTTPS        int                  `json:"short_url_length_https"`
+	NonUsernamePaths           []string             `json:"non_username_paths"`
+}
+
+type PhotoSize struct {
+	H      int    `json:"h`
+	Resize string `json:"resize"`
+	W      int    `json:"w"`
+}
