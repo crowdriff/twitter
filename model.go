@@ -197,6 +197,7 @@ type User struct {
 	WithheldScope                  string   `json:"withheld_scope"`
 }
 
+// Configuration represents the configuration object received from Twitter help/configuration endpoint
 type Configuration struct {
 	CharactersReservedPerMedia int                  `json:"characters_reserved_per_media"`
 	DMTextCharacterLimit       int                  `json:"dm_text_character_limit"`
@@ -208,8 +209,16 @@ type Configuration struct {
 	NonUsernamePaths           []string             `json:"non_username_paths"`
 }
 
+// PhotoSize represents the photo size object iside configuration objectt
 type PhotoSize struct {
-	H      int    `json:"h`
+	H      int    `json:"h"`
 	Resize string `json:"resize"`
 	W      int    `json:"w"`
+}
+
+// Language represents the language obejct received from Twitter help/langauges
+type Language struct {
+	Code   string `json:"code"`
+	Status string `json:"status"`
+	Name   string `json:"name"`
 }
