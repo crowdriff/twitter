@@ -4,6 +4,7 @@ go:
   - 1.7.1
 
 install:
+  - make tools
   - make build
 
 script:
