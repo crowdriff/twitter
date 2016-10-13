@@ -102,6 +102,47 @@ func (c *Client) DestroyDirectMessage(ctx context.Context, params DestroyDirectM
 	}, nil
 }
 
+// NewDirectMessageParams ...
+type NewDirectMessageParams struct {
+	UserID     string
+	ScreenName string
+	Text       string
+}
+
+// NewDirectMessage calls the Twitter /direct_messages/sent.json endpoint.
+func (c *Client) NewDirectMessage(ctx context.Context, params NewDirectMessageParams) (*DirectMessageResponse, error) {
+	values := newDirectMessageToQuery(params)
+	resp, err := c.do(ctx, "POST", "https://api.twitter.com/1.1/direct_messages/new.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var directMessage DirectMessage
+	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &DirectMessageResponse{
+		DirectMessage: directMessage,
+		RateLimit:     getRateLimit(resp.Header),
+	}, nil
+}
+
+// newDirectMessageToQuery ...
+func newDirectMessageToQuery(params NewDirectMessageParams) url.Values {
+	values := url.Values{}
+	if params.UserID != "" {
+		values.Set("user_id", params.UserID)
+	}
+	if params.ScreenName != "" {
+		values.Set("screen_name", params.ScreenName)
+	}
+	if params.Text != "" {
+		values.Set("text", params.Text)
+	}
+	return values
+}
+
 // SentDirectMessagesParams ...
 type SentDirectMessagesParams struct {
 	SinceID         string
