@@ -25,7 +25,7 @@ func (c *Client) GetDirectMessages(ctx context.Context, params GetDirectMessages
 	}
 	defer resp.Body.Close()
 	var directMessages []DirectMessage
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&directMessages)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *Client) DestroyDirectMessage(ctx context.Context, params DestroyDirectM
 	}
 	defer resp.Body.Close()
 	var directMessage DirectMessage
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&directMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (c *Client) NewDirectMessage(ctx context.Context, params NewDirectMessagePa
 	}
 	defer resp.Body.Close()
 	var directMessage DirectMessage
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&directMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (c *Client) SentDirectMessages(ctx context.Context, params SentDirectMessag
 	}
 	defer resp.Body.Close()
 	var directMessages []DirectMessage
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&directMessages)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +185,7 @@ func (c *Client) ShowDirectMessage(ctx context.Context, directMessageID string) 
 	}
 	defer resp.Body.Close()
 	var directMessage DirectMessage
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&directMessage)
 	if err != nil {
 		return nil, err
 	}
