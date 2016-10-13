@@ -1,0 +1,8 @@
+hash: cd45b64ae36e11d4abca2121f63e46ef19c0f9ee9091930961172fcf2a0e16be
+updated: 2016-10-13T18:53:06.613900992-04:00
+imports:
+- name: github.com/garyburd/go-oauth
+  version: 719b069913e1151a73ea30d2ea4f90deda3ce234
+  subpackages:
+  - oauth
+testImports: []
