@@ -7,15 +7,6 @@ import (
 	"strconv"
 )
 
-// GetDirectMessagesParams ...
-type GetDirectMessagesParams struct {
-	SinceID         string
-	MaxID           string
-	Count           int
-	ExcludeEntities bool
-	SkipStatus      bool
-}
-
 // DirectMessage ...
 type DirectMessage struct {
 	CreatedAt           string   `json:"created_at"`
@@ -29,6 +20,15 @@ type DirectMessage struct {
 	SenderID            int64    `json:"sender_id"`
 	SenderScreenName    string   `json:"sender_screen_name"`
 	Text                string   `json:"text"`
+}
+
+// GetDirectMessagesParams ...
+type GetDirectMessagesParams struct {
+	SinceID         string
+	MaxID           string
+	Count           int
+	ExcludeEntities bool
+	SkipStatus      bool
 }
 
 // GetDirectMessages calls the Twitter /direct_messages.json endpoint.
@@ -69,4 +69,35 @@ func getDirectMessagesToQuery(params GetDirectMessagesParams) url.Values {
 		values.Set("skip_status", "true")
 	}
 	return values
+}
+
+// DestroyDirectMessageParams  ...
+type DestroyDirectMessageParams struct {
+	ID              string
+	ExcludeEntities bool
+}
+
+// DestroyDirectMessages calls the Twitter /direct_messages/destroy.json endpoint.
+func (c *Client) DestroyDirectMessages(ctx context.Context, params DestroyDirectMessageParams) (*DirectMessageResponse, error) {
+	values := url.Values{}
+	if params.ID != "" {
+		values.Set("id", params.ID)
+	}
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
+	}
+	resp, err := c.do(ctx, "POST", "https://api.twitter.com/1.1/direct_messages/destroy.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var directMessage DirectMessage
+	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &DirectMessageResponse{
+		DirectMessage: directMessage,
+		RateLimit:     getRateLimit(resp.Header),
+	}, nil
 }
