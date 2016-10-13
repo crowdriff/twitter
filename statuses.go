@@ -27,7 +27,7 @@ func (c *Client) MentionsTimeline(ctx context.Context, params MentionsTimelinePa
 	}
 	defer resp.Body.Close()
 	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&tweets)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (c *Client) UserTimeline(ctx context.Context, params UserTimelineParams) (*
 	}
 	defer resp.Body.Close()
 	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&tweets)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (c *Client) HomeTimeline(ctx context.Context, params HomeTimelineParams) (*
 	}
 	defer resp.Body.Close()
 	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&tweets)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func (c *Client) RetweetsOfMe(ctx context.Context, params RetweetsOfMeParams) (*
 	}
 	defer resp.Body.Close()
 	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&tweets)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (c *Client) RetweetsOfTweet(ctx context.Context, params RetweetsOfTweetPara
 	}
 	defer resp.Body.Close()
 	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&tweets)
 	if err != nil {
 		return nil, err
 	}
@@ -274,36 +274,36 @@ func retweetsOfTweetToQuery(params RetweetsOfTweetParams) url.Values {
 	return values
 }
 
-// GetTweetParams represents the query parameters for a
+// ShowTweetParams represents the query parameters for a
 // /statuses/show/:id.json request.
-type GetTweetParams struct {
+type ShowTweetParams struct {
 	ID               string `json:"id"`
 	TrimUser         bool   `json:"trim_user"`
 	IncludeMyRetweet bool   `json:"include_my_retweet"`
 	ExcludeEntities  bool   `json:"exclude_entities"`
 }
 
-// GetTweet calls the Twitter /statuses/show/:id.json endpoint.
-func (c *Client) GetTweet(ctx context.Context, params GetTweetParams) (*TweetsResponse, error) {
-	values := getTweetToQuery(params)
+// ShowTweet calls the Twitter /statuses/show/:id.json endpoint.
+func (c *Client) ShowTweet(ctx context.Context, params ShowTweetParams) (*TweetResponse, error) {
+	values := showTweetToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/show.json"
 	resp, err := c.do(ctx, "GET", urlStr, values)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	var tweet Tweet
+	err = json.NewDecoder(resp.Body).Decode(&tweet)
 	if err != nil {
 		return nil, err
 	}
-	return &TweetsResponse{
-		Tweets:    tweets,
+	return &TweetResponse{
+		Tweet:     tweet,
 		RateLimit: getRateLimit(resp.Header),
 	}, nil
 }
 
-func getTweetToQuery(params GetTweetParams) url.Values {
+func showTweetToQuery(params ShowTweetParams) url.Values {
 	values := url.Values{}
 	values.Set("id", params.ID)
 	if params.TrimUser {
@@ -314,6 +314,42 @@ func getTweetToQuery(params GetTweetParams) url.Values {
 	}
 	if params.ExcludeEntities {
 		values.Set("include_entities", "false")
+	}
+	return values
+}
+
+// DestroyTweetParams represents the query parameters for a
+// /statuses/show/:id.json request.
+type DestroyTweetParams struct {
+	ID       string `json:"id"`
+	TrimUser bool   `json:"trim_user"`
+}
+
+// DestroyTweet calls the Twitter /statuses/show/:id.json endpoint.
+func (c *Client) DestroyTweet(ctx context.Context, params DestroyTweetParams) (*TweetResponse, error) {
+	values := destroyTweetToQuery(params)
+	urlStr := "https://api.twitter.com/1.1/statuses/destroy/" + params.ID + ".json"
+	resp, err := c.do(ctx, "POST", urlStr, values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var tweet Tweet
+	err = json.NewDecoder(resp.Body).Decode(&tweet)
+	if err != nil {
+		return nil, err
+	}
+	return &TweetResponse{
+		Tweet:     tweet,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func destroyTweetToQuery(params DestroyTweetParams) url.Values {
+	values := url.Values{}
+	values.Set("id", params.ID)
+	if params.TrimUser {
+		values.Set("trim_user", "true")
 	}
 	return values
 }
