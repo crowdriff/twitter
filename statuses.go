@@ -181,3 +181,56 @@ func homeTimelineToQuery(params HomeTimelineParams) url.Values {
 	}
 	return values
 }
+
+// RetweetsOfMeParams represents the query parameters for a
+// /statuses/retweets_of_me.json request.
+type RetweetsOfMeParams struct {
+	Count               int    `json:"count"`
+	SinceID             string `json:"since_id"`
+	MaxID               string `json:"max_id"`
+	TrimUser            bool   `json:"trim_user"`
+	ExcludeEntities     bool   `json:"exclude_entities"`
+	ExcludeUserEntities bool   `json:"exclude_user_entities"`
+}
+
+// RetweetsOfMe calls the Twitter /statuses/retweets_of_me.json endpoint.
+func (c *Client) RetweetsOfMe(ctx context.Context, params RetweetsOfMeParams) (*TweetsResponse, error) {
+	values := retweetsOfMeToQuery(params)
+	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/statuses/retweets_of_me.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var tweets []Tweet
+	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &TweetsResponse{
+		Tweets:    tweets,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func retweetsOfMeToQuery(params RetweetsOfMeParams) url.Values {
+	values := url.Values{}
+	if params.Count > 0 {
+		values.Set("count", strconv.Itoa(params.Count))
+	}
+	if params.SinceID != "" {
+		values.Set("since_id", params.SinceID)
+	}
+	if params.MaxID != "" {
+		values.Set("max_id", params.MaxID)
+	}
+	if params.TrimUser {
+		values.Set("trim_user", "true")
+	}
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
+	}
+	if params.ExcludeUserEntities {
+		values.Set("include_user_entities", "false")
+	}
+	return values
+}
