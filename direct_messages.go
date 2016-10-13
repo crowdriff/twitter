@@ -102,6 +102,51 @@ func (c *Client) DestroyDirectMessage(ctx context.Context, params DestroyDirectM
 	}, nil
 }
 
+// SentDirectMessagesParams ...
+type SentDirectMessagesParams struct {
+	SinceID         string
+	MaxID           string
+	Page            int
+	ExcludeEntities bool
+}
+
+// SentDirectMessages calls the Twitter /direct_messages/sent.json endpoint.
+func (c *Client) SentDirectMessages(ctx context.Context, params SentDirectMessagesParams) (*DirectMessagesResponse, error) {
+	values := sentDirectMessagesToQuery(params)
+	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/direct_messages/sent.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var directMessages []DirectMessage
+	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &DirectMessagesResponse{
+		DirectMessages: directMessages,
+		RateLimit:      getRateLimit(resp.Header),
+	}, nil
+}
+
+// sentDirectMessagesToQuery ...
+func sentDirectMessagesToQuery(params SentDirectMessagesParams) url.Values {
+	values := url.Values{}
+	if params.SinceID != "" {
+		values.Set("since_id", params.SinceID)
+	}
+	if params.MaxID != "" {
+		values.Set("max_id", params.MaxID)
+	}
+	if params.Page > 1 {
+		values.Set("page", strconv.Itoa(params.Page))
+	}
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
+	}
+	return values
+}
+
 // ShowDirectMessage calls the Twitter /direct_messages/show.json endpoint.
 func (c *Client) ShowDirectMessage(ctx context.Context, directMessageID string) (*DirectMessageResponse, error) {
 	values := url.Values{}
