@@ -234,3 +234,42 @@ func retweetsOfMeToQuery(params RetweetsOfMeParams) url.Values {
 	}
 	return values
 }
+
+// RetweetsOfTweetParams represents the query parameters for a
+// /statuses/retweets/:id.json request.
+type RetweetsOfTweetParams struct {
+	ID       string `json:"id"`
+	Count    int    `json:"count"`
+	TrimUser bool   `json:"trim_user"`
+}
+
+// RetweetsOfTweet calls the Twitter /statuses/retweets/:id.json endpoint.
+func (c *Client) RetweetsOfTweet(ctx context.Context, params RetweetsOfTweetParams) (*TweetsResponse, error) {
+	values := retweetsOfTweetToQuery(params)
+	urlStr := "https://api.twitter.com/1.1/statuses/retweets/" + params.ID + ".json"
+	resp, err := c.do(ctx, "GET", urlStr, values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var tweets []Tweet
+	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &TweetsResponse{
+		Tweets:    tweets,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func retweetsOfTweetToQuery(params RetweetsOfTweetParams) url.Values {
+	values := url.Values{}
+	if params.Count > 0 {
+		values.Set("count", strconv.Itoa(params.Count))
+	}
+	if params.TrimUser {
+		values.Set("trim_user", "true")
+	}
+	return values
+}
