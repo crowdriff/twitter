@@ -14,6 +14,12 @@ import (
 	"time"
 )
 
+// StartFilterStream starts and returns a new Stream using the provided context,
+// stream filter parameters, and optional stream error callback.
+func (c *Client) StartFilterStream(ctx context.Context, params StreamFilterParams, errFn StreamErrFn) *Stream {
+	return newFilterStream(ctx, c, params, errFn)
+}
+
 // StreamFilterParams represents the filter parameters used in a stream.
 // https://dev.twitter.com/streaming/overview/request-parameters
 type StreamFilterParams struct {
@@ -100,7 +106,7 @@ type Stream struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	client   OAuthClient
+	client   oauthClient
 	values   url.Values
 	endpoint string
 
@@ -110,7 +116,7 @@ type Stream struct {
 	errFn     StreamErrFn
 }
 
-func newFilterStream(ctx context.Context, client OAuthClient, params StreamFilterParams, errFn StreamErrFn) *Stream {
+func newFilterStream(ctx context.Context, client oauthClient, params StreamFilterParams, errFn StreamErrFn) *Stream {
 	s := Stream{
 		client:    client,
 		values:    parseFilterParams(params),
@@ -160,29 +166,27 @@ func (s *Stream) notifyError(boff Backoff, err error) error {
 }
 
 func (s *Stream) start() {
-	var err error
 	defer func() {
 		s.cancel()
-		s.closeErr = err
 		close(s.chDone)
 	}()
 
 	boff := &backoff{}
 	for {
-		err = s.makeRequest(boff)
+		s.closeErr = s.makeRequest(boff)
 		select {
 		case <-s.ctx.Done():
-			err = s.ctx.Err()
+			s.closeErr = s.ctx.Err()
 			return
 		default:
 		}
-		if err != nil {
+		if s.closeErr != nil {
 			return
 		}
 		if d := boff.wait(); d > 0 {
 			select {
 			case <-s.ctx.Done():
-				err = s.ctx.Err()
+				s.closeErr = s.ctx.Err()
 				return
 			case <-time.After(d):
 			}
@@ -196,7 +200,7 @@ func (s *Stream) makeRequest(boff *backoff) error {
 	defer cancel()
 
 	// Make HTTP request to open stream.
-	resp, err := s.client.Do(ctx, "POST", nil, s.endpoint, s.values)
+	resp, err := s.client.do(ctx, "POST", s.endpoint, s.values)
 	if err != nil {
 		boff.incNetDelay()
 		return s.notifyError(boff, err)
@@ -237,7 +241,6 @@ func (s *Stream) readMessage(cancel context.CancelFunc, scanner *bufio.Scanner) 
 	// Set 90 second timeout on receiving a message.
 	// https://dev.twitter.com/streaming/overview/connecting
 	t := time.AfterFunc(90*time.Second, func() { cancel() })
-	// Scan next token.
 	ok := scanner.Scan()
 	t.Stop()
 	if !ok {
