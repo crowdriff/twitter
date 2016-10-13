@@ -23,12 +23,6 @@ type SearchTweetsParams struct {
 	Callback        string
 }
 
-// TweetsResponse represents a response from Twitter containing multiple Tweets.
-type TweetsResponse struct {
-	Tweets    []Tweet
-	RateLimit RateLimit
-}
-
 // SearchTweets calls the Twitter /search/tweets.json endpoint.
 func (c *Client) SearchTweets(ctx context.Context, params SearchTweetsParams) (*TweetsResponse, error) {
 	values := searchTweetsToQuery(params)
