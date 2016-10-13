@@ -273,3 +273,47 @@ func retweetsOfTweetToQuery(params RetweetsOfTweetParams) url.Values {
 	}
 	return values
 }
+
+// GetTweetParams represents the query parameters for a
+// /statuses/show/:id.json request.
+type GetTweetParams struct {
+	ID               string `json:"id"`
+	TrimUser         bool   `json:"trim_user"`
+	IncludeMyRetweet bool   `json:"include_my_retweet"`
+	ExcludeEntities  bool   `json:"exclude_entities"`
+}
+
+// GetTweet calls the Twitter /statuses/show/:id.json endpoint.
+func (c *Client) GetTweet(ctx context.Context, params GetTweetParams) (*TweetsResponse, error) {
+	values := getTweetToQuery(params)
+	urlStr := "https://api.twitter.com/1.1/statuses/show.json"
+	resp, err := c.do(ctx, "GET", urlStr, values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var tweets []Tweet
+	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &TweetsResponse{
+		Tweets:    tweets,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func getTweetToQuery(params GetTweetParams) url.Values {
+	values := url.Values{}
+	values.Set("id", params.ID)
+	if params.TrimUser {
+		values.Set("trim_user", "true")
+	}
+	if params.IncludeMyRetweet {
+		values.Set("include_my_retweet", "true")
+	}
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
+	}
+	return values
+}
