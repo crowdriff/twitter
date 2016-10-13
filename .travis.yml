@@ -1,0 +1,13 @@
+language: go
+
+go:
+  - 1.7.1
+
+before_install:
+  - scripts/travis-before-install.sh
+
+install:
+  - make build
+
+script:
+  - make test
