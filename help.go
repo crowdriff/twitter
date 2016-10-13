@@ -4,30 +4,29 @@ import (
 	"context"
 	"encoding/json"
 	"net/url"
-	"strconv"
 )
 
 // GetConfiguration calls the Twitter /help/configuration.json endpoint.
-func (c *Client) GetConfiguration(ctx context.Context) (*Configuration, error) {
-	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/help/configuration.json")
+func (c *Client) GetConfiguration(ctx context.Context) (*ConfigurationResponse, error) {
+	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/help/configuration.json", url.Values{})
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var c Configuration
-	err = json.NewDecoder(resp.Body).Decode(c)
+	var config Configuration
+	err = json.NewDecoder(resp.Body).Decode(config)
 	if err != nil {
 		return nil, err
 	}
 	return &ConfigurationResponse{
-		Configuration: c,
+		Configuration: config,
 		RateLimit:     getRateLimit(resp.Header),
 	}, nil
 }
 
 // GetLanguages calls Twitter help/langauges.json endpoint.
-func (c *Client) GetLanguages(ctx context.Context) (*[]Language, error) {
-	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/help/langauges.json")
+func (c *Client) GetLanguages(ctx context.Context) (*LanguagesResponse, error) {
+	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/help/langauges.json", url.Values{})
 	if err != nil {
 		return nil, err
 	}
@@ -37,26 +36,44 @@ func (c *Client) GetLanguages(ctx context.Context) (*[]Language, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &LanguageResponse{
+	return &LanguagesResponse{
 		Languages: ls,
 		RateLimit: getRateLimit(resp.Header),
 	}, nil
 }
 
 // GetPrivacy calls Twitter help/privacy.json endpoint.
-func (c *Client) GetPrivacy(ctx context.Context) (*[string]string, error) {
-	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/help/privacy.json")
+func (c *Client) GetPrivacy(ctx context.Context) (*PrivacyResponse, error) {
+	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/help/privacy.json", url.Values{})
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var p [string]string
+	var p map[string]string
 	err = json.NewDecoder(resp.Body).Decode(p)
 	if err != nil {
 		return nil, err
 	}
 	return &PrivacyResponse{
 		Privacy:   p,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+// GetTOS calls Twitter help/tos.json endpoint.
+func (c *Client) GetTOS(ctx context.Context) (*TOSResponse, error) {
+	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/help/tos.json", url.Values{})
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var tos map[string]string
+	err = json.NewDecoder(resp.Body).Decode(tos)
+	if err != nil {
+		return nil, err
+	}
+	return &TOSResponse{
+		TOS:       tos,
 		RateLimit: getRateLimit(resp.Header),
 	}, nil
 }

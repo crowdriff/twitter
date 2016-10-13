@@ -20,6 +20,12 @@ type LanguagesResponse struct {
 
 // PrivacyResponse represents a response from Twitter containing privacy.
 type PrivacyResponse struct {
-	Privacy   [string]string
+	Privacy   map[string]string
+	RateLimit RateLimit
+}
+
+// TOSResponse represents a response from Twitter containing terms of service.
+type TOSResponse struct {
+	TOS       map[string]string
 	RateLimit RateLimit
 }
