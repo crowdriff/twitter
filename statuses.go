@@ -438,10 +438,10 @@ type RetweeterIDsParams struct {
 }
 
 // RetweeterIDs calls the Twitter /statuses/retweeters/ids.json endpoint.
-func (c *Client) RetweeterIDs(ctx context.Context, params RetweeterIDsParams) (*TweetResponse, error) {
+func (c *Client) RetweeterIDs(ctx context.Context, params RetweeterIDsParams) (*IDsResponse, error) {
 	values := retweeterIDsToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/retweeters/ids.json"
-	return c.handleTweetResponse(ctx, "GET", urlStr, values)
+	return c.handleIDsResponse(ctx, "GET", urlStr, values)
 }
 
 func retweeterIDsToQuery(params RetweeterIDsParams) url.Values {
@@ -464,10 +464,10 @@ type LookupParams struct {
 }
 
 // Lookup calls the Twitter /statuses/lookup.json endpoint.
-func (c *Client) Lookup(ctx context.Context, params LookupParams) (*TweetResponse, error) {
+func (c *Client) Lookup(ctx context.Context, params LookupParams) (*TweetsResponse, error) {
 	values := lookupToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/lookup.json"
-	return c.handleTweetResponse(ctx, "GET", urlStr, values)
+	return c.handleTweetsResponse(ctx, "GET", urlStr, values)
 }
 
 func lookupToQuery(params LookupParams) url.Values {

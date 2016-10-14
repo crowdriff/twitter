@@ -72,6 +72,12 @@ type OEmbedResponse struct {
 	RateLimit RateLimit
 }
 
+// IDsResponse represents a response from Twitter with paginated string IDs.
+type IDsResponse struct {
+	IDs       IDs
+	RateLimit RateLimit
+}
+
 func (c *Client) handleTweetsResponse(ctx context.Context, method, urlStr string, values url.Values) (*TweetsResponse, error) {
 	resp, err := c.do(ctx, method, urlStr, values)
 	if err != nil {
@@ -108,6 +114,26 @@ func (c *Client) handleTweetResponse(ctx context.Context, method, urlStr string,
 	}
 	return &TweetResponse{
 		Tweet:     tweet,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func (c *Client) handleIDsResponse(ctx context.Context, method, urlStr string, values url.Values) (*IDsResponse, error) {
+	resp, err := c.do(ctx, method, urlStr, values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var ids IDs
+	err = json.NewDecoder(resp.Body).Decode(&ids)
+	if err != nil {
+		return nil, err
+	}
+	return &IDsResponse{
+		IDs:       ids,
 		RateLimit: getRateLimit(resp.Header),
 	}, nil
 }

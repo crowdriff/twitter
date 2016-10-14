@@ -252,3 +252,12 @@ type OEmbed struct {
 	Height       *int   `json:"height"`
 	Width        *int   `json:"width"`
 }
+
+// IDs represents a paginated list of string IDs.
+type IDs struct {
+	IDs               []string `json:"ids"`
+	PreviousCursor    int64    `json:"previous_cursor"`
+	PreviousCursotStr string   `json:"previous_cursor_str"`
+	NextCursor        int64    `json:"next_cursor"`
+	NextCursorStr     string   `json:"next_cursor_str"`
+}
