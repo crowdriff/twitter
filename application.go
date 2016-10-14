@@ -15,10 +15,10 @@ type RateLimitsRes struct {
 
 	Resources struct {
 		Help struct {
-			Privacy       RateLimit `json:"/help/privacy"`
-			TOS           RateLimit `json:"/help/tos"`
 			Configuration RateLimit `json:"/help/configuration"`
 			Languages     RateLimit `json:"/help/languages"`
+			Privacy       RateLimit `json:"/help/privacy"`
+			TOS           RateLimit `json:"/help/tos"`
 		} `json:"help"`
 		Users struct {
 			Contributees           RateLimit `json:"/users/contributees"`
