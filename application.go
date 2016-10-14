@@ -51,15 +51,17 @@ type RateLimitsRes struct {
 // RateLimitStatus calls the Twitter /application/rate_limit_status.json endpoint.
 func (c *Client) RateLimitStatus(ctx context.Context, resources []string) (*RateLimitStatusResponse, error) {
 	values := url.Values{}
-	resourcesParam := strings.Join(resources, ",")
-	if resourcesParam != "" {
-		values.Set("resources", resourcesParam)
+	if len(resources) > 0 {
+		values.Set("resources", strings.Join(resources, ","))
 	}
 	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/application/rate_limit_status.json", values)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var res RateLimitsRes
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {

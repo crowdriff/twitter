@@ -31,6 +31,9 @@ func (c *Client) SearchTweets(ctx context.Context, params SearchTweetsParams) (*
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var tweets []Tweet
 	err = json.NewDecoder(resp.Body).Decode(resp.Body)
 	if err != nil {
