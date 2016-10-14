@@ -12,6 +12,12 @@ type DirectMessagesResponse struct {
 	RateLimit      RateLimit
 }
 
+// RateLimitStatusResponse represents a response from Twitter containing multiple RateLimitStatuses.
+type RateLimitStatusResponse struct {
+	RateLimitsRes RateLimitsRes
+	RateLimit     RateLimit
+}
+
 // TweetsResponse represents a response from Twitter containing multiple Tweets.
 type TweetsResponse struct {
 	Tweets    []Tweet
