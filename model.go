@@ -237,3 +237,12 @@ type Language struct {
 	Status string `json:"status"`
 	Name   string `json:"name"`
 }
+
+// UserIDPage represents a single page of UserIDs returned by the "following or "followers" endpoint.
+type UserIDPage struct {
+	IDs               []string `json:"ids"`
+	NextCursor        int64    `json:"next_cursor"`
+	NextCursorStr     string   `json:"next_cursor_str"`
+	PreviousCursor    int64    `json:"previous_cursor"`
+	PreviousCursorStr string   `json:"previous_cursor_str"`
+}

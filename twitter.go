@@ -41,3 +41,15 @@ type TOSResponse struct {
 	TOS       map[string]string
 	RateLimit RateLimit
 }
+
+// UserIDsResponse represents a list of User IDs from Twitter.
+type UserIDsResponse struct {
+	UserIDs   []string
+	RateLimit RateLimit
+}
+
+// UserIDsPageResponse represents a page of UserIDs from Twitter.
+type UserIDsPageResponse struct {
+	UserIDPage UserIDPage
+	RateLimit  RateLimit
+}
