@@ -238,6 +238,7 @@ type Language struct {
 	Name   string `json:"name"`
 }
 
+// FollowerIDs represents the follower ids obejct received from Twitter followers/ids
 type FollowerIDs struct {
 	IDs               []int  `json:"ids"`
 	NextCursor        int    `json:"next_cursor"`
