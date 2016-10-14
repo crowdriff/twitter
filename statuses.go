@@ -453,3 +453,34 @@ func retweeterIDsToQuery(params RetweeterIDsParams) url.Values {
 	}
 	return values
 }
+
+// LookupParams represents the query parameters for a /statuses/lookup.json
+// request.
+type LookupParams struct {
+	IDs             []string
+	ExcludeEntities bool
+	TrimUser        bool
+	Map             bool
+}
+
+// Lookup calls the Twitter /statuses/lookup.json endpoint.
+func (c *Client) Lookup(ctx context.Context, params LookupParams) (*TweetResponse, error) {
+	values := lookupToQuery(params)
+	urlStr := "https://api.twitter.com/1.1/statuses/lookup.json"
+	return c.handleTweetResponse(ctx, "GET", urlStr, values)
+}
+
+func lookupToQuery(params LookupParams) url.Values {
+	values := url.Values{}
+	values.Set("id", strings.Join(params.IDs, ","))
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
+	}
+	if params.TrimUser {
+		values.Set("trim_user", "true")
+	}
+	if params.Map {
+		values.Set("map", "true")
+	}
+	return values
+}
