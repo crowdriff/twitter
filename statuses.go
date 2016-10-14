@@ -320,13 +320,13 @@ func showTweetToQuery(params ShowTweetParams) url.Values {
 }
 
 // DestroyTweetParams represents the query parameters for a
-// /statuses/show/:id.json request.
+// /statuses/destroy/:id.json request.
 type DestroyTweetParams struct {
 	ID       string `json:"id"`
 	TrimUser bool   `json:"trim_user"`
 }
 
-// DestroyTweet calls the Twitter /statuses/show/:id.json endpoint.
+// DestroyTweet calls the Twitter /statuses/destroy/:id.json endpoint.
 func (c *Client) DestroyTweet(ctx context.Context, params DestroyTweetParams) (*TweetResponse, error) {
 	values := destroyTweetToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/destroy/" + params.ID + ".json"
@@ -356,7 +356,7 @@ func destroyTweetToQuery(params DestroyTweetParams) url.Values {
 }
 
 // UpdateTweetParams represents the query parameters for a
-// /statuses/show/:id.json request.
+// /statuses/update.json request.
 type UpdateTweetParams struct {
 	Status             string
 	InReplyToStatusID  string
@@ -368,7 +368,7 @@ type UpdateTweetParams struct {
 	MediaIDs           []string
 }
 
-// UpdateTweet calls the Twitter /statuses/show/:id.json endpoint.
+// UpdateTweet calls the Twitter /statuses/update.json endpoint.
 func (c *Client) UpdateTweet(ctx context.Context, params UpdateTweetParams) (*TweetResponse, error) {
 	values := updateTweetToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/update.json"
@@ -412,6 +412,41 @@ func updateTweetToQuery(params UpdateTweetParams) url.Values {
 	}
 	if len(params.MediaIDs) > 0 {
 		values.Set("media_ids", strings.Join(params.MediaIDs, ","))
+	}
+	return values
+}
+
+// RetweetParams represents the query parameters for a
+// /statuses/retweet/:id.json request.
+type RetweetParams struct {
+	ID       string
+	TrimUser bool
+}
+
+// Retweet calls the Twitter /statuses/retweet/:id.json endpoint.
+func (c *Client) Retweet(ctx context.Context, params RetweetParams) (*TweetResponse, error) {
+	values := retweetToQuery(params)
+	urlStr := "https://api.twitter.com/1.1/statuses/retweet/" + params.ID + ".json"
+	resp, err := c.do(ctx, "POST", urlStr, values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var tweet Tweet
+	err = json.NewDecoder(resp.Body).Decode(&tweet)
+	if err != nil {
+		return nil, err
+	}
+	return &TweetResponse{
+		Tweet:     tweet,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func retweetToQuery(params RetweetParams) url.Values {
+	values := url.Values{}
+	if params.TrimUser {
+		values.Set("trim_user", "true")
 	}
 	return values
 }
