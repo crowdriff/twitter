@@ -60,6 +60,12 @@ type TOSResponse struct {
 	RateLimit RateLimit
 }
 
+// OEmbedResponse represents a response from Twitter oembed request.
+type OEmbedResponse struct {
+	OEmbed    OEmbed
+	RateLimit RateLimit
+}
+
 func (c *Client) handleTweetsResponse(ctx context.Context, method, urlStr string, values url.Values) (*TweetsResponse, error) {
 	resp, err := c.do(ctx, method, urlStr, values)
 	if err != nil {

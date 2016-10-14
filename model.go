@@ -237,3 +237,18 @@ type Language struct {
 	Status string `json:"status"`
 	Name   string `json:"name"`
 }
+
+// OEmbed represents the response body for an oembed request.
+type OEmbed struct {
+	CacheAge     string `json:"cache_age"`
+	URL          string `json:"url"`
+	ProviderURL  string `json:"provider_url"`
+	ProviderName string `json:"provider_name"`
+	AuthorName   string `json:"author_name"`
+	Version      string `json:"version"`
+	AuthorURL    string `json:"author_url"`
+	Type         string `json:"type"`
+	HTML         string `json:"html"`
+	Height       *int   `json:"height"`
+	Width        *int   `json:"width"`
+}

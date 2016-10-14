@@ -2,6 +2,7 @@ package twitter
 
 import (
 	"context"
+	"encoding/json"
 	"net/url"
 	"strconv"
 	"strings"
@@ -355,6 +356,76 @@ func unretweetToQuery(params UnretweetParams) url.Values {
 	values := url.Values{}
 	if params.TrimUser {
 		values.Set("trim_user", "true")
+	}
+	return values
+}
+
+// OEmbedParams represents the query parameters for an oembed request.
+type OEmbedParams struct {
+	URL        string
+	MaxWidth   int
+	HideMedia  bool
+	HideThread bool
+	OmitScript bool
+	Align      string
+	Related    []string
+	Lang       string
+	WidgetType string
+	HideTweet  bool
+}
+
+// OEmbed calls the Twitter oembed endpoint.
+func (c *Client) OEmbed(ctx context.Context, params OEmbedParams) (*OEmbedResponse, error) {
+	values := oembedToQuery(params)
+	urlStr := "https://publish.twitter.com/oembed"
+	resp, err := c.do(ctx, "GET", urlStr, values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var oembed OEmbed
+	err = json.NewDecoder(resp.Body).Decode(&oembed)
+	if err != nil {
+		return nil, err
+	}
+	return &OEmbedResponse{
+		OEmbed:    oembed,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func oembedToQuery(params OEmbedParams) url.Values {
+	values := url.Values{}
+	values.Set("url", params.URL)
+	if params.MaxWidth > 0 {
+		values.Set("max_width", strconv.Itoa(params.MaxWidth))
+	}
+	if params.HideMedia {
+		values.Set("hide_media", "true")
+	}
+	if params.HideThread {
+		values.Set("hide_thread", "true")
+	}
+	if params.OmitScript {
+		values.Set("omit_script", "true")
+	}
+	if params.Align != "" {
+		values.Set("align", params.Align)
+	}
+	if len(params.Related) > 0 {
+		values.Set("related", strings.Join(params.Related, ","))
+	}
+	if params.Lang != "" {
+		values.Set("lang", params.Lang)
+	}
+	if params.WidgetType != "" {
+		values.Set("widget_type", params.WidgetType)
+	}
+	if params.HideTweet {
+		values.Set("hide_tweet", "true")
 	}
 	return values
 }
