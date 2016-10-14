@@ -24,6 +24,9 @@ func (c *Client) GetDirectMessages(ctx context.Context, params GetDirectMessages
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var directMessages []DirectMessage
 	err = json.NewDecoder(resp.Body).Decode(&directMessages)
 	if err != nil {
@@ -65,9 +68,7 @@ type DestroyDirectMessageParams struct {
 // DestroyDirectMessage calls the Twitter /direct_messages/destroy.json endpoint.
 func (c *Client) DestroyDirectMessage(ctx context.Context, params DestroyDirectMessageParams) (*DirectMessageResponse, error) {
 	values := url.Values{}
-	if params.ID != "" {
-		values.Set("id", params.ID)
-	}
+	values.Set("id", params.ID)
 	if params.ExcludeEntities {
 		values.Set("include_entities", "false")
 	}
@@ -76,6 +77,9 @@ func (c *Client) DestroyDirectMessage(ctx context.Context, params DestroyDirectM
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var directMessage DirectMessage
 	err = json.NewDecoder(resp.Body).Decode(&directMessage)
 	if err != nil {
@@ -102,6 +106,9 @@ func (c *Client) NewDirectMessage(ctx context.Context, params NewDirectMessagePa
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var directMessage DirectMessage
 	err = json.NewDecoder(resp.Body).Decode(&directMessage)
 	if err != nil {
@@ -122,9 +129,7 @@ func newDirectMessageToQuery(params NewDirectMessageParams) url.Values {
 	if params.ScreenName != "" {
 		values.Set("screen_name", params.ScreenName)
 	}
-	if params.Text != "" {
-		values.Set("text", params.Text)
-	}
+	values.Set("text", params.Text)
 	return values
 }
 
@@ -132,6 +137,7 @@ func newDirectMessageToQuery(params NewDirectMessageParams) url.Values {
 type SentDirectMessagesParams struct {
 	SinceID         string
 	MaxID           string
+	Count           int
 	Page            int
 	ExcludeEntities bool
 }
@@ -144,6 +150,9 @@ func (c *Client) SentDirectMessages(ctx context.Context, params SentDirectMessag
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var directMessages []DirectMessage
 	err = json.NewDecoder(resp.Body).Decode(&directMessages)
 	if err != nil {
@@ -164,7 +173,10 @@ func sentDirectMessagesToQuery(params SentDirectMessagesParams) url.Values {
 	if params.MaxID != "" {
 		values.Set("max_id", params.MaxID)
 	}
-	if params.Page > 1 {
+	if params.Count > 0 {
+		values.Set("count", strconv.Itoa(params.Count))
+	}
+	if params.Page > 0 {
 		values.Set("page", strconv.Itoa(params.Page))
 	}
 	if params.ExcludeEntities {
@@ -174,16 +186,16 @@ func sentDirectMessagesToQuery(params SentDirectMessagesParams) url.Values {
 }
 
 // ShowDirectMessage calls the Twitter /direct_messages/show.json endpoint.
-func (c *Client) ShowDirectMessage(ctx context.Context, directMessageID string) (*DirectMessageResponse, error) {
-	values := url.Values{}
-	if directMessageID != "" {
-		values.Set("id", directMessageID)
-	}
+func (c *Client) ShowDirectMessage(ctx context.Context, id string) (*DirectMessageResponse, error) {
+	values := url.Values{"id": []string{id}}
 	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/direct_messages/show.json", values)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var directMessage DirectMessage
 	err = json.NewDecoder(resp.Body).Decode(&directMessage)
 	if err != nil {

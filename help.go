@@ -13,6 +13,9 @@ func (c *Client) GetConfiguration(ctx context.Context) (*ConfigurationResponse, 
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var config Configuration
 	err = json.NewDecoder(resp.Body).Decode(&config)
 	if err != nil {
@@ -31,6 +34,9 @@ func (c *Client) GetLanguages(ctx context.Context) (*LanguagesResponse, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var ls []Language
 	err = json.NewDecoder(resp.Body).Decode(&ls)
 	if err != nil {
@@ -49,6 +55,9 @@ func (c *Client) GetPrivacy(ctx context.Context) (*PrivacyResponse, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var p map[string]string
 	err = json.NewDecoder(resp.Body).Decode(&p)
 	if err != nil {
@@ -67,6 +76,9 @@ func (c *Client) GetTOS(ctx context.Context) (*TOSResponse, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var tos map[string]string
 	err = json.NewDecoder(resp.Body).Decode(&tos)
 	if err != nil {
