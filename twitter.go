@@ -47,3 +47,15 @@ type TOSResponse struct {
 	TOS       map[string]string
 	RateLimit RateLimit
 }
+
+// FollowerListResponse represents a response from Twitter containing follower list.
+type FollowerListResponse struct {
+	Users     map[string][]User
+	RateLimit RateLimit
+}
+
+// FollowerIDsResponse represents a response from Twitter containing follower ids.
+type FollowerIDsResponse struct {
+	FollowerIDs FollowerIDs
+	RateLimit   RateLimit
+}
