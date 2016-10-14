@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 // MentionsTimelineParams represents the query parameters for a
@@ -350,6 +351,67 @@ func destroyTweetToQuery(params DestroyTweetParams) url.Values {
 	values.Set("id", params.ID)
 	if params.TrimUser {
 		values.Set("trim_user", "true")
+	}
+	return values
+}
+
+// UpdateTweetParams represents the query parameters for a
+// /statuses/show/:id.json request.
+type UpdateTweetParams struct {
+	Status             string
+	InReplyToStatusID  string
+	PossiblySensitive  bool
+	Location           *Location
+	PlaceID            string
+	DisplayCoordinates bool
+	TrimUser           bool
+	MediaIDs           []string
+}
+
+// UpdateTweet calls the Twitter /statuses/show/:id.json endpoint.
+func (c *Client) UpdateTweet(ctx context.Context, params UpdateTweetParams) (*TweetResponse, error) {
+	values := updateTweetToQuery(params)
+	urlStr := "https://api.twitter.com/1.1/statuses/update.json"
+	resp, err := c.do(ctx, "POST", urlStr, values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var tweet Tweet
+	err = json.NewDecoder(resp.Body).Decode(&tweet)
+	if err != nil {
+		return nil, err
+	}
+	return &TweetResponse{
+		Tweet:     tweet,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func updateTweetToQuery(params UpdateTweetParams) url.Values {
+	values := url.Values{}
+	values.Set("status", params.Status)
+	if params.InReplyToStatusID != "" {
+		values.Set("in_reply_to_status_id", params.InReplyToStatusID)
+	}
+	if params.PossiblySensitive {
+		values.Set("possibly_sensitive", "true")
+	}
+	if params.Location != nil {
+		values.Set("lat", strconv.FormatFloat(params.Location.Lat, 'f', -1, 64))
+		values.Set("long", strconv.FormatFloat(params.Location.Long, 'f', -1, 64))
+	}
+	if params.PlaceID != "" {
+		values.Set("place_id", params.PlaceID)
+	}
+	if params.DisplayCoordinates {
+		values.Set("display_coordinates", "true")
+	}
+	if params.TrimUser {
+		values.Set("trim_user", "true")
+	}
+	if len(params.MediaIDs) > 0 {
+		values.Set("media_ids", strings.Join(params.MediaIDs, ","))
 	}
 	return values
 }
