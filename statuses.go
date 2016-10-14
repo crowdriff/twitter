@@ -450,3 +450,41 @@ func retweetToQuery(params RetweetParams) url.Values {
 	}
 	return values
 }
+
+// UnretweetParams represents the query parameters for a
+// /statuses/retweet/:id.json request.
+type UnretweetParams struct {
+	ID       string
+	TrimUser bool
+}
+
+// Unretweet calls the Twitter /statuses/retweet/:id.json endpoint.
+func (c *Client) Unretweet(ctx context.Context, params UnretweetParams) (*TweetResponse, error) {
+	values := unretweetToQuery(params)
+	urlStr := "https://api.twitter.com/1.1/statuses/unretweet/" + params.ID + ".json"
+	resp, err := c.do(ctx, "POST", urlStr, values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var tweet Tweet
+	err = json.NewDecoder(resp.Body).Decode(&tweet)
+	if err != nil {
+		return nil, err
+	}
+	return &TweetResponse{
+		Tweet:     tweet,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func unretweetToQuery(params UnretweetParams) url.Values {
+	values := url.Values{}
+	if params.TrimUser {
+		values.Set("trim_user", "true")
+	}
+	return values
+}
