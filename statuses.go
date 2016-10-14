@@ -2,7 +2,6 @@ package twitter
 
 import (
 	"context"
-	"encoding/json"
 	"net/url"
 	"strconv"
 	"strings"
@@ -22,20 +21,8 @@ type MentionsTimelineParams struct {
 // MentionsTimeline calls the Twitter /statuses/mentions_timeline.json endpoint.
 func (c *Client) MentionsTimeline(ctx context.Context, params MentionsTimelineParams) (*TweetsResponse, error) {
 	values := mentionsTimelineToQuery(params)
-	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/statuses/mentions_timeline.json", values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweets)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetsResponse{
-		Tweets:    tweets,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	urlStr := "https://api.twitter.com/1.1/statuses/mentions_timeline.json"
+	return c.handleTweetsResponse(ctx, "GET", urlStr, values)
 }
 
 func mentionsTimelineToQuery(params MentionsTimelineParams) url.Values {
@@ -78,20 +65,8 @@ type UserTimelineParams struct {
 // UserTimeline calls the Twitter /statuses/user_timeline.json endpoint.
 func (c *Client) UserTimeline(ctx context.Context, params UserTimelineParams) (*TweetsResponse, error) {
 	values := userTimelineToQuery(params)
-	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/statuses/user_timeline.json", values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweets)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetsResponse{
-		Tweets:    tweets,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	urlStr := "https://api.twitter.com/1.1/statuses/user_timeline.json"
+	return c.handleTweetsResponse(ctx, "GET", urlStr, values)
 }
 
 func userTimelineToQuery(params UserTimelineParams) url.Values {
@@ -141,20 +116,8 @@ type HomeTimelineParams struct {
 // HomeTimeline calls the Twitter /statuses/home_timeline.json endpoint.
 func (c *Client) HomeTimeline(ctx context.Context, params HomeTimelineParams) (*TweetsResponse, error) {
 	values := homeTimelineToQuery(params)
-	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/statuses/home_timeline.json", values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweets)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetsResponse{
-		Tweets:    tweets,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	urlStr := "https://api.twitter.com/1.1/statuses/home_timeline.json"
+	return c.handleTweetsResponse(ctx, "GET", urlStr, values)
 }
 
 func homeTimelineToQuery(params HomeTimelineParams) url.Values {
@@ -197,20 +160,8 @@ type RetweetsOfMeParams struct {
 // RetweetsOfMe calls the Twitter /statuses/retweets_of_me.json endpoint.
 func (c *Client) RetweetsOfMe(ctx context.Context, params RetweetsOfMeParams) (*TweetsResponse, error) {
 	values := retweetsOfMeToQuery(params)
-	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/statuses/retweets_of_me.json", values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweets)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetsResponse{
-		Tweets:    tweets,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	urlStr := "https://api.twitter.com/1.1/statuses/retweets_of_me.json"
+	return c.handleTweetsResponse(ctx, "GET", urlStr, values)
 }
 
 func retweetsOfMeToQuery(params RetweetsOfMeParams) url.Values {
@@ -248,20 +199,7 @@ type RetweetsOfTweetParams struct {
 func (c *Client) RetweetsOfTweet(ctx context.Context, params RetweetsOfTweetParams) (*TweetsResponse, error) {
 	values := retweetsOfTweetToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/retweets/" + params.ID + ".json"
-	resp, err := c.do(ctx, "GET", urlStr, values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweets)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetsResponse{
-		Tweets:    tweets,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	return c.handleTweetsResponse(ctx, "GET", urlStr, values)
 }
 
 func retweetsOfTweetToQuery(params RetweetsOfTweetParams) url.Values {
@@ -288,20 +226,7 @@ type ShowTweetParams struct {
 func (c *Client) ShowTweet(ctx context.Context, params ShowTweetParams) (*TweetResponse, error) {
 	values := showTweetToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/show.json"
-	resp, err := c.do(ctx, "GET", urlStr, values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var tweet Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweet)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetResponse{
-		Tweet:     tweet,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	return c.handleTweetResponse(ctx, "GET", urlStr, values)
 }
 
 func showTweetToQuery(params ShowTweetParams) url.Values {
@@ -330,20 +255,7 @@ type DestroyTweetParams struct {
 func (c *Client) DestroyTweet(ctx context.Context, params DestroyTweetParams) (*TweetResponse, error) {
 	values := destroyTweetToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/destroy/" + params.ID + ".json"
-	resp, err := c.do(ctx, "POST", urlStr, values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var tweet Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweet)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetResponse{
-		Tweet:     tweet,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	return c.handleTweetResponse(ctx, "POST", urlStr, values)
 }
 
 func destroyTweetToQuery(params DestroyTweetParams) url.Values {
@@ -372,20 +284,7 @@ type UpdateTweetParams struct {
 func (c *Client) UpdateTweet(ctx context.Context, params UpdateTweetParams) (*TweetResponse, error) {
 	values := updateTweetToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/update.json"
-	resp, err := c.do(ctx, "POST", urlStr, values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var tweet Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweet)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetResponse{
-		Tweet:     tweet,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	return c.handleTweetResponse(ctx, "POST", urlStr, values)
 }
 
 func updateTweetToQuery(params UpdateTweetParams) url.Values {
@@ -427,20 +326,7 @@ type RetweetParams struct {
 func (c *Client) Retweet(ctx context.Context, params RetweetParams) (*TweetResponse, error) {
 	values := retweetToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/retweet/" + params.ID + ".json"
-	resp, err := c.do(ctx, "POST", urlStr, values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var tweet Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweet)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetResponse{
-		Tweet:     tweet,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	return c.handleTweetResponse(ctx, "POST", urlStr, values)
 }
 
 func retweetToQuery(params RetweetParams) url.Values {
@@ -462,23 +348,7 @@ type UnretweetParams struct {
 func (c *Client) Unretweet(ctx context.Context, params UnretweetParams) (*TweetResponse, error) {
 	values := unretweetToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/unretweet/" + params.ID + ".json"
-	resp, err := c.do(ctx, "POST", urlStr, values)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if err = checkResponse(resp); err != nil {
-		return nil, err
-	}
-	var tweet Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweet)
-	if err != nil {
-		return nil, err
-	}
-	return &TweetResponse{
-		Tweet:     tweet,
-		RateLimit: getRateLimit(resp.Header),
-	}, nil
+	return c.handleTweetResponse(ctx, "POST", urlStr, values)
 }
 
 func unretweetToQuery(params UnretweetParams) url.Values {
