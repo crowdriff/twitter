@@ -77,7 +77,7 @@ type FollowerIDsParams struct {
 // GetFollowerIDs calls the Twitter /followers/ids.json endpoint.
 func (c *Client) GetFollowerIDs(ctx context.Context, params FollowerIDsParams) (*FollowerIDsResponse, error) {
 	values := followerIDsToQuery(params)
-	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/followers/list.json", values)
+	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/followers/ids.json", values)
 	if err != nil {
 		return nil, err
 	}
