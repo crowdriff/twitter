@@ -429,3 +429,27 @@ func oembedToQuery(params OEmbedParams) url.Values {
 	}
 	return values
 }
+
+// RetweeterIDsParams represents the query parameters for a
+// /statuses/retweeters/ids.json request.
+type RetweeterIDsParams struct {
+	ID     string
+	Cursor string
+}
+
+// RetweeterIDs calls the Twitter /statuses/retweeters/ids.json endpoint.
+func (c *Client) RetweeterIDs(ctx context.Context, params RetweeterIDsParams) (*TweetResponse, error) {
+	values := retweeterIDsToQuery(params)
+	urlStr := "https://api.twitter.com/1.1/statuses/retweeters/ids.json"
+	return c.handleTweetResponse(ctx, "GET", urlStr, values)
+}
+
+func retweeterIDsToQuery(params RetweeterIDsParams) url.Values {
+	values := url.Values{}
+	values.Set("id", params.ID)
+	values.Set("stringify_ids", "true")
+	if params.Cursor != "" {
+		values.Set("cursor", params.Cursor)
+	}
+	return values
+}
