@@ -124,7 +124,7 @@ type AccessCredentials struct {
 
 type accCredsKeyType int
 
-const accCredsKey = 0
+const accCredsKey accCredsKeyType = 0
 
 func (c *Client) accessCredentials(ctx context.Context) *oauth.Credentials {
 	if val := ctx.Value(accCredsKey); val != nil {
