@@ -237,12 +237,3 @@ type Language struct {
 	Status string `json:"status"`
 	Name   string `json:"name"`
 }
-
-// FollowerIDs represents the follower ids obejct received from Twitter followers/ids
-type FollowerIDs struct {
-	IDs               []int  `json:"ids"`
-	NextCursor        int    `json:"next_cursor"`
-	NextCursorStr     string `json:"next_cursor_str"`
-	PreviousCursor    string `json:"previous_cursor"`
-	PreviousCursorStr string `json:"previous_cursor_str"`
-}

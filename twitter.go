@@ -42,14 +42,9 @@ type TOSResponse struct {
 	RateLimit RateLimit
 }
 
-// FollowerListResponse represents a response from Twitter containing follower list.
-type FollowerListResponse struct {
-	Users     map[string][]User
+// FListResponse represents a response from Twitter containing a
+// followers or friends list.
+type FListResponse struct {
+	Users     []User
 	RateLimit RateLimit
-}
-
-// FollowerIDsResponse represents a response from Twitter containing follower ids.
-type FollowerIDsResponse struct {
-	FollowerIDs FollowerIDs
-	RateLimit   RateLimit
 }
