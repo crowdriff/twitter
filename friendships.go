@@ -5,16 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
 )
 
 // NoRetweetIDs calls the Twitter /friendships/no_retweets/ids.json endpoint.
 func (c *Client) NoRetweetIDs(ctx context.Context, stringifyIDs bool) (*UserIDsResponse, error) {
 	values := url.Values{}
-	if stringifyIDs {
-		values.Set("stringify_ids", "true")
-	} else {
-		values.Set("stringify_ids", "false")
-	}
+	values.Set("stringify_ids", strconv.FormatBool(stringifyIDs))
 	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/friendships/no_retweets/ids.json", values)
 	if err != nil {
 		return nil, err
@@ -41,11 +38,7 @@ func (c *Client) friendshipsDirection(ctx context.Context, direction string,
 	if cursor != "" {
 		values.Set("cursor", cursor)
 	}
-	if stringifyIDs {
-		values.Set("stringify_ids", "true")
-	} else {
-		values.Set("stringify_ids", "false")
-	}
+	values.Set("stringify_ids", strconv.FormatBool(stringifyIDs))
 	resp, err := c.do(ctx, "GET", fmt.Sprintf(
 		"https://api.twitter.com/1.1/friendships/%s.json", direction), values)
 	if err != nil {
@@ -88,11 +81,7 @@ func (c *Client) FriendshipsCreate(ctx context.Context, screenName,
 	if userID != "" {
 		values.Set("user_id", userID)
 	}
-	if follow {
-		values.Set("follow", "true")
-	} else {
-		values.Set("follow", "false")
-	}
+	values.Set("follow", strconv.FormatBool(follow))
 	resp, err := c.do(ctx, "POST",
 		"https://api.twitter.com/1.1/friendships/create.json", values)
 	if err != nil {
@@ -140,5 +129,42 @@ func (c *Client) FriendshipsDestroy(ctx context.Context, screenName,
 	return &UserResponse{
 		User:      res,
 		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+type friendshipsUpdateResponse struct {
+	Relationship `json:"relationship"`
+}
+
+// FriendshipsUpdate calls the Twitter /friendships/update.json endpoint.
+func (c *Client) FriendshipsUpdate(ctx context.Context, screenName,
+	userID string, device, retweets bool) (*RelationshipResponse, error) {
+	values := url.Values{}
+	if screenName != "" {
+		values.Set("screen_name", screenName)
+	}
+	if userID != "" {
+		values.Set("user_id", userID)
+	}
+	values.Set("device", strconv.FormatBool(device))
+	values.Set("retweets", strconv.FormatBool(retweets))
+
+	resp, err := c.do(ctx, "POST",
+		"https://api.twitter.com/1.1/friendships/update.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var res friendshipsUpdateResponse
+	err = json.NewDecoder(resp.Body).Decode(&res)
+	if err != nil {
+		return nil, err
+	}
+	return &RelationshipResponse{
+		Relationship: res.Relationship,
+		RateLimit:    getRateLimit(resp.Header),
 	}, nil
 }

@@ -246,3 +246,26 @@ type UserIDPage struct {
 	PreviousCursor    int64    `json:"previous_cursor"`
 	PreviousCursorStr string   `json:"previous_cursor_str"`
 }
+
+// Relationship represents the relationship between two users.
+type Relationship struct {
+	Target struct {
+		FollowedBy bool   `json:"followed_by"`
+		ID         int64  `json:"id"`
+		IDStr      string `json:"id_str"`
+		ScreenName string `json:"screen_name"`
+	} `json:"target"`
+	Source struct {
+		AllReplies           bool   `json:"all_replies"`
+		Blocking             bool   `json:"blocking"`
+		CanDM                bool   `json:"can_dm"`
+		FollowedBy           bool   `json:"followed_by"`
+		Following            bool   `json:"following"`
+		ID                   int64  `json:"id"`
+		IDStr                string `json:"id_str"`
+		MarkedSpam           bool   `json:"marked_spam"`
+		NotificationsEnabled bool   `json:"notifications_enabled"`
+		ScreenName           string `json:"screen_name"`
+		WantRetweets         bool   `json:"want_retweets"`
+	} `json:"source"`
+}

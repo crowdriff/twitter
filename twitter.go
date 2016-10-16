@@ -59,3 +59,9 @@ type UserIDsPageResponse struct {
 	UserIDPage UserIDPage
 	RateLimit  RateLimit
 }
+
+// RelationshipResponse represents the relationship between two Users.
+type RelationshipResponse struct {
+	Relationship Relationship
+	RateLimit    RateLimit
+}
