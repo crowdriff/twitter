@@ -42,6 +42,12 @@ type TOSResponse struct {
 	RateLimit RateLimit
 }
 
+// UserResponse represents a single User from Twitter.
+type UserResponse struct {
+	User      User
+	RateLimit RateLimit
+}
+
 // UserIDsResponse represents a list of User IDs from Twitter.
 type UserIDsResponse struct {
 	UserIDs   []string
