@@ -132,7 +132,7 @@ func (c *Client) FriendshipsDestroy(ctx context.Context, screenName,
 	}, nil
 }
 
-type friendshipsUpdateResponse struct {
+type friendshipsRelationship struct {
 	Relationship `json:"relationship"`
 }
 
@@ -158,7 +158,43 @@ func (c *Client) FriendshipsUpdate(ctx context.Context, screenName,
 	if err = checkResponse(resp); err != nil {
 		return nil, err
 	}
-	var res friendshipsUpdateResponse
+	var res friendshipsRelationship
+	err = json.NewDecoder(resp.Body).Decode(&res)
+	if err != nil {
+		return nil, err
+	}
+	return &RelationshipResponse{
+		Relationship: res.Relationship,
+		RateLimit:    getRateLimit(resp.Header),
+	}, nil
+}
+
+// FriendshipsShow calls the Twitter /friendships/show.json endpoint.
+func (c *Client) FriendshipsShow(ctx context.Context, sourceID, targetID int64,
+	sourceScreenName, targetScreenName string) (*RelationshipResponse, error) {
+	values := url.Values{}
+	if sourceID > 0 {
+		values.Set("source_id", strconv.FormatInt(sourceID, 10))
+	}
+	if targetID > 0 {
+		values.Set("target_id", strconv.FormatInt(targetID, 10))
+	}
+	if sourceScreenName != "" {
+		values.Set("source_screen_name", sourceScreenName)
+	}
+	if targetScreenName != "" {
+		values.Set("target_screen_name", targetScreenName)
+	}
+	resp, err := c.do(ctx, "GET",
+		"https://api.twitter.com/1.1/friendships/show.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var res friendshipsRelationship
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
 		return nil, err
