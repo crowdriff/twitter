@@ -247,8 +247,17 @@ type UserIDPage struct {
 	PreviousCursorStr string   `json:"previous_cursor_str"`
 }
 
-// Relationship represents the relationship between two users.
+// Relationship represents the relationship between the authenticated user and another user.
 type Relationship struct {
+	Name        string   `json:"name"`
+	ScreenName  string   `json:"screen_name"`
+	ID          int64    `json:"id"`
+	IDStr       string   `json:"id_str"`
+	Connections []string `json:"connections"`
+}
+
+// RelationshipDetail represents the detailed relationship between two users.
+type RelationshipDetail struct {
 	Target struct {
 		FollowedBy bool   `json:"followed_by"`
 		ID         int64  `json:"id"`

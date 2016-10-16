@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 // NoRetweetIDs calls the Twitter /friendships/no_retweets/ids.json endpoint.
@@ -132,13 +133,13 @@ func (c *Client) FriendshipsDestroy(ctx context.Context, screenName,
 	}, nil
 }
 
-type friendshipsRelationship struct {
-	Relationship `json:"relationship"`
+type friendshipsDetail struct {
+	RelationshipDetail `json:"relationship"`
 }
 
 // FriendshipsUpdate calls the Twitter /friendships/update.json endpoint.
 func (c *Client) FriendshipsUpdate(ctx context.Context, screenName,
-	userID string, device, retweets bool) (*RelationshipResponse, error) {
+	userID string, device, retweets bool) (*RelationshipDetailResponse, error) {
 	values := url.Values{}
 	if screenName != "" {
 		values.Set("screen_name", screenName)
@@ -158,20 +159,20 @@ func (c *Client) FriendshipsUpdate(ctx context.Context, screenName,
 	if err = checkResponse(resp); err != nil {
 		return nil, err
 	}
-	var res friendshipsRelationship
+	var res friendshipsDetail
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
 		return nil, err
 	}
-	return &RelationshipResponse{
-		Relationship: res.Relationship,
+	return &RelationshipDetailResponse{
+		Relationship: res.RelationshipDetail,
 		RateLimit:    getRateLimit(resp.Header),
 	}, nil
 }
 
 // FriendshipsShow calls the Twitter /friendships/show.json endpoint.
 func (c *Client) FriendshipsShow(ctx context.Context, sourceID, targetID int64,
-	sourceScreenName, targetScreenName string) (*RelationshipResponse, error) {
+	sourceScreenName, targetScreenName string) (*RelationshipDetailResponse, error) {
 	values := url.Values{}
 	if sourceID > 0 {
 		values.Set("source_id", strconv.FormatInt(sourceID, 10))
@@ -187,6 +188,40 @@ func (c *Client) FriendshipsShow(ctx context.Context, sourceID, targetID int64,
 	}
 	resp, err := c.do(ctx, "GET",
 		"https://api.twitter.com/1.1/friendships/show.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var res friendshipsDetail
+	err = json.NewDecoder(resp.Body).Decode(&res)
+	if err != nil {
+		return nil, err
+	}
+	return &RelationshipDetailResponse{
+		Relationship: res.RelationshipDetail,
+		RateLimit:    getRateLimit(resp.Header),
+	}, nil
+}
+
+type friendshipsRelationship struct {
+	Relationship `json:"relationship"`
+}
+
+// FriendshipsLookup calls the Twitter /friendships/lookup.json endpoint.
+func (c *Client) FriendshipsLookup(ctx context.Context,
+	screenNames, userIDs []string) (*RelationshipResponse, error) {
+	values := url.Values{}
+	if len(screenNames) > 0 {
+		values.Set("screen_name", strings.Join(screenNames, ","))
+	}
+	if len(userIDs) > 0 {
+		values.Set("user_id", strings.Join(userIDs, ","))
+	}
+	resp, err := c.do(ctx, "GET",
+		"https://api.twitter.com/1.1/friendships/lookup.json", values)
 	if err != nil {
 		return nil, err
 	}
