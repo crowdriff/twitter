@@ -20,6 +20,9 @@ func (c *Client) NoRetweetIDs(ctx context.Context, stringifyIDs bool) (*UserIDsR
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var userIDs []string
 	err = json.NewDecoder(resp.Body).Decode(&userIDs)
 	if err != nil {
@@ -49,6 +52,9 @@ func (c *Client) friendshipsDirection(ctx context.Context, direction string,
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var res UserIDPage
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
@@ -93,6 +99,9 @@ func (c *Client) FriendshipsCreate(ctx context.Context, screenName,
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
 	var res User
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
