@@ -112,3 +112,33 @@ func (c *Client) FriendshipsCreate(ctx context.Context, screenName,
 		RateLimit: getRateLimit(resp.Header),
 	}, nil
 }
+
+// FriendshipsDestroy calls the Twitter /friendships/destroy.json endpoint.
+func (c *Client) FriendshipsDestroy(ctx context.Context, screenName,
+	userID string) (*UserResponse, error) {
+	values := url.Values{}
+	if screenName != "" {
+		values.Set("screen_name", screenName)
+	}
+	if userID != "" {
+		values.Set("user_id", userID)
+	}
+	resp, err := c.do(ctx, "POST",
+		"https://api.twitter.com/1.1/friendships/destroy.json", values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var res User
+	err = json.NewDecoder(resp.Body).Decode(&res)
+	if err != nil {
+		return nil, err
+	}
+	return &UserResponse{
+		User:      res,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
