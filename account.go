@@ -3,6 +3,9 @@ package twitter
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"net/url"
+	"strconv"
 )
 
 // AccountSettings represents all the settings returned by
@@ -41,10 +44,84 @@ type AccountSettings struct {
 	AllowContributorRequest  string `json:"allow_contributor_request"`
 }
 
-// AccountSettings calls the Twitter /account/settings.json endpoint.
-func (c *Client) AccountSettings(ctx context.Context) (
+// GetAccountSettings calls the Twitter /account/settings.json endpoint.
+func (c *Client) GetAccountSettings(ctx context.Context) (
 	*AccountSettingsResponse, error) {
-	resp, err := c.do(ctx, "GET", "https://api.twitter.com/1.1/account/settings.json", nil)
+	resp, err := c.do(ctx, "GET",
+		"https://api.twitter.com/1.1/account/settings.json", nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var res AccountSettings
+	err = json.NewDecoder(resp.Body).Decode(&res)
+	if err != nil {
+		return nil, err
+	}
+	return &AccountSettingsResponse{
+		AccountSettings: res,
+		RateLimit:       getRateLimit(resp.Header),
+	}, nil
+}
+
+// AccountSettingsParams represents all the account settings that can be
+// modified via the API.
+type AccountSettingsParams struct {
+	SleepTimeEnabled        *bool
+	StartSleepTime          string // ISO8601 format (00-23)
+	EndSleepTime            string // ISO8601 format (00-23)
+	TimeZone                string
+	TrendLocationWoeID      int64
+	AllowContributorRequest string
+	CurrentPassword         string
+	Lang                    string
+}
+
+// accountSettingsToQuery transforms an AccountSettingsParams to a url.Values
+// that can be tacked onto the URL of the HTTP request.
+func accountSettingsToQuery(p *AccountSettingsParams) (url.Values, error) {
+	v := url.Values{}
+	if p.SleepTimeEnabled != nil {
+		v.Set("sleep_time_enabled", strconv.FormatBool(*p.SleepTimeEnabled))
+	}
+	if p.StartSleepTime != "" {
+		v.Set("start_sleep_time", p.StartSleepTime)
+	}
+	if p.EndSleepTime != "" {
+		v.Set("end_sleep_time", p.EndSleepTime)
+	}
+	if p.TimeZone != "" {
+		v.Set("time_zone", p.TimeZone)
+	}
+	if p.TrendLocationWoeID > 0 {
+		v.Set("trend_location_woeid", strconv.FormatInt(p.TrendLocationWoeID, 10))
+	}
+	if p.AllowContributorRequest != "" {
+		if p.CurrentPassword == "" {
+			return nil, errors.New("CurrentPassword must be set when updating" +
+				" AllowContributorRequest")
+		}
+		v.Set("allow_contributor_request", p.AllowContributorRequest)
+		v.Set("current_password", p.CurrentPassword)
+	}
+	if p.Lang != "" {
+		v.Set("lang", p.Lang)
+	}
+	return v, nil
+}
+
+// UpdateAccountSettings calls the Twitter /account/settings.json endpoint.
+func (c *Client) UpdateAccountSettings(ctx context.Context, params AccountSettingsParams) (
+	*AccountSettingsResponse, error) {
+	values, err := accountSettingsToQuery(&params)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.do(ctx, "POST",
+		"https://api.twitter.com/1.1/account/settings.json", values)
 	if err != nil {
 		return nil, err
 	}
