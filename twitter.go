@@ -78,6 +78,19 @@ type IDsResponse struct {
 	RateLimit RateLimit
 }
 
+// AccountSettingsResponse represents a response from Twitter with all of the
+// account's settings.
+type AccountSettingsResponse struct {
+	AccountSettings AccountSettings
+	RateLimit       RateLimit
+}
+
+// UserResponse represents a response from Twitter containing a single user.
+type UserResponse struct {
+	User      User
+	RateLimit RateLimit
+}
+
 func (c *Client) handleTweetsResponse(ctx context.Context, method, urlStr string, values url.Values) (*TweetsResponse, error) {
 	resp, err := c.do(ctx, method, urlStr, values)
 	if err != nil {
