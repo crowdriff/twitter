@@ -35,7 +35,7 @@ func (c *Client) SearchTweets(ctx context.Context, params SearchTweetsParams) (*
 		return nil, err
 	}
 	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(resp.Body)
+	err = json.NewDecoder(resp.Body).Decode(&tweets)
 	if err != nil {
 		return nil, err
 	}
