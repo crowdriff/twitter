@@ -8,6 +8,7 @@ type Tweet struct {
 	Coordinates          *Coordinates           `json:"coordinates"`
 	CreatedAt            string                 `json:"created_at"`
 	Entities             Entities               `json:"entities"`
+	ExtendedEntities     ExtendedEntities       `json:"extended_entities"`
 	FavoriteCount        int                    `json:"favorite_count"`
 	Favorited            bool                   `json:"favorited"`
 	FilterLevel          string                 `json:"filter_level"`
@@ -60,6 +61,11 @@ type DirectMessage struct {
 	Text                string   `json:"text"`
 }
 
+// ExtendedEntities provides metadata about the media entities present.
+type ExtendedEntities struct {
+	Media []MediaEntity `json:"media"`
+}
+
 // Entities provides metadata and additonal contextual information about twitter
 // content.
 type Entities struct {
@@ -91,6 +97,21 @@ type MediaEntity struct {
 	SourceStatusIDStr string     `json:"source_status_id_str"`
 	Type              string     `json:"type"`
 	URL               string     `json:"url"`
+	VideoInfo
+}
+
+// VideoInfo represents information specific to videos.
+type VideoInfo struct {
+	AspectRatio    []int          `json:"aspect_ratio"`
+	DurationMillis int            `json:"duration_millis"`
+	Variants       []VideoVariant `json:"variants"`
+}
+
+// VideoVariant represents video info for a single bitrate.
+type VideoVariant struct {
+	Bitrate     int    `json:"bitrate"`
+	ContentType string `json:"content_type"`
+	URL         string `json:"url"`
 }
 
 // MediaSize represents the height, width, and resize string of a media element.
