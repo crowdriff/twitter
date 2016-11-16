@@ -97,7 +97,7 @@ type MediaEntity struct {
 	SourceStatusIDStr string     `json:"source_status_id_str"`
 	Type              string     `json:"type"`
 	URL               string     `json:"url"`
-	VideoInfo
+	VideoInfo         VideoInfo  `json:"video_info"`
 }
 
 // VideoInfo represents information specific to videos.
