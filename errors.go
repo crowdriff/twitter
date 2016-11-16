@@ -25,6 +25,10 @@ func (e *Errors) Error() string {
 	var buf bytes.Buffer
 	buf.WriteString(strconv.Itoa(e.HTTPCode))
 	buf.WriteString(": ")
+	if len(e.Errors) == 0 {
+		buf.WriteString("Unknown error")
+		return buf.String()
+	}
 	buf.WriteByte('[')
 	for i, err := range e.Errors {
 		if i > 0 {
@@ -47,9 +51,6 @@ func checkResponse(resp *http.Response) error {
 	errs := Errors{
 		HTTPCode: resp.StatusCode,
 	}
-	err := json.NewDecoder(resp.Body).Decode(&errs)
-	if err != nil {
-		return err
-	}
+	_ = json.NewDecoder(resp.Body).Decode(&errs)
 	return &errs
 }
