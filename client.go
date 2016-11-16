@@ -2,6 +2,7 @@ package twitter
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -55,8 +56,19 @@ func (c *Client) WithGzipDisabled() *Client {
 func (c *Client) do(ctx context.Context, method string, urlStr string, values url.Values) (*http.Response, error) {
 	// Set credentials.
 	accessCreds := c.accessCredentials(ctx)
+
+	// Set up request URL and body.
+	var body io.Reader
+	switch method {
+	case "GET", "HEAD":
+		urlStr = urlStr + "?" + values.Encode()
+		values = nil
+	default:
+		body = strings.NewReader(values.Encode())
+	}
+
 	// Create HTTP request.
-	req, err := http.NewRequest(method, urlStr, strings.NewReader(values.Encode()))
+	req, err := http.NewRequest(method, urlStr, body)
 	if err != nil {
 		return nil, err
 	}
@@ -69,6 +81,7 @@ func (c *Client) do(ctx context.Context, method string, urlStr string, values ur
 	if err != nil {
 		return nil, err
 	}
+
 	// Make request.
 	resp, err := c.httpClient.Do(req)
 	if c.gzipDisabled || err != nil || !isGzipped(resp.Header) {
