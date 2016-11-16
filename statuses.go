@@ -467,7 +467,7 @@ type LookupParams struct {
 func (c *Client) Lookup(ctx context.Context, params LookupParams) (*TweetsResponse, error) {
 	values := lookupToQuery(params)
 	urlStr := "https://api.twitter.com/1.1/statuses/lookup.json"
-	return c.handleTweetsResponse(ctx, "GET", urlStr, values)
+	return c.handleTweetsResponse(ctx, "POST", urlStr, values)
 }
 
 func lookupToQuery(params LookupParams) url.Values {
