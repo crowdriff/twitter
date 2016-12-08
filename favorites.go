@@ -32,7 +32,7 @@ func listFavoritesToQuery(params ListFavoritesParams) url.Values {
 	if params.ScreenName != "" {
 		values.Set("screen_name", params.ScreenName)
 	}
-	if params.Count != 20 {
+	if params.Count != 0 {
 		values.Set("count", strconv.Itoa(params.Count))
 	}
 	if params.SinceID != "" {

@@ -78,6 +78,18 @@ type IDsResponse struct {
 	RateLimit RateLimit
 }
 
+// UserResponse represents a response from Twitter with a user object
+type UserResponse struct {
+	RateLimit RateLimit
+	User      User
+}
+
+// UsersResponse represents a response from Twitter with a list of user objects
+type UsersResponse struct {
+	RateLimit RateLimit
+	Users     []User
+}
+
 func (c *Client) handleTweetsResponse(ctx context.Context, method, urlStr string, values url.Values) (*TweetsResponse, error) {
 	resp, err := c.do(ctx, method, urlStr, values)
 	if err != nil {
@@ -134,6 +146,46 @@ func (c *Client) handleIDsResponse(ctx context.Context, method, urlStr string, v
 	}
 	return &IDsResponse{
 		IDs:       ids,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func (c *Client) handleUserResponse(ctx context.Context, method, urlStr string, values url.Values) (*UserResponse, error) {
+	resp, err := c.do(ctx, method, urlStr, values)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var user User
+	err = json.NewDecoder(resp.Body).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &UserResponse{
+		User:      user,
+		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func (c *Client) handleUsersResponse(ctx context.Context, method, urlStr string, values url.Values) (*UsersResponse, error) {
+	resp, err := c.do(ctx, method, urlStr, values)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var users []User
+	err = json.NewDecoder(resp.Body).Decode(&users)
+	if err != nil {
+		return nil, err
+	}
+	return &UsersResponse{
+		Users:     users,
 		RateLimit: getRateLimit(resp.Header),
 	}, nil
 }
