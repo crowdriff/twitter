@@ -90,6 +90,18 @@ type UsersResponse struct {
 	Users     []User
 }
 
+// FriendshipResponse represents a response from Twitter with two objects describing the relationship between two users
+type FriendshipResponse struct {
+	RateLimit  RateLimit
+	Friendship Friendship
+}
+
+// FriendshipLookupResponse represents a response from Twitter with a list of user relationship details relative to currently authorized user
+type FriendshipLookupResponse struct {
+	RateLimit        RateLimit
+	FriendshipLookup []FriendshipLookup
+}
+
 func (c *Client) handleTweetsResponse(ctx context.Context, method, urlStr string, values url.Values) (*TweetsResponse, error) {
 	resp, err := c.do(ctx, method, urlStr, values)
 	if err != nil {
@@ -187,5 +199,45 @@ func (c *Client) handleUsersResponse(ctx context.Context, method, urlStr string,
 	return &UsersResponse{
 		Users:     users,
 		RateLimit: getRateLimit(resp.Header),
+	}, nil
+}
+
+func (c *Client) handleFriendshipResponse(ctx context.Context, method, urlStr string, values url.Values) (*FriendshipResponse, error) {
+	resp, err := c.do(ctx, method, urlStr, values)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var friendship Friendship
+	err = json.NewDecoder(resp.Body).Decode(&friendship)
+	if err != nil {
+		return nil, err
+	}
+	return &FriendshipResponse{
+		RateLimit:  getRateLimit(resp.Header),
+		Friendship: friendship,
+	}, nil
+}
+
+func (c *Client) handleFriendshipsResponse(ctx context.Context, method, urlStr string, values url.Values) (*FriendshipLookupResponse, error) {
+	resp, err := c.do(ctx, method, urlStr, values)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+	var friendshipLookup []FriendshipLookup
+	err = json.NewDecoder(resp.Body).Decode(&friendshipLookup)
+	if err != nil {
+		return nil, err
+	}
+	return &FriendshipLookupResponse{
+		RateLimit:        getRateLimit(resp.Header),
+		FriendshipLookup: friendshipLookup,
 	}, nil
 }

@@ -282,3 +282,31 @@ type IDs struct {
 	NextCursor        int64    `json:"next_cursor"`
 	NextCursorStr     string   `json:"next_cursor_str"`
 }
+
+// RelationshipTarget represents a Twitter user's relationship with a source
+type RelationshipTarget struct {
+	IDStr      string `json:"id_str"`
+	ID         int64  `json:"id"`
+	ScreenName string `json:"screen_name"`
+	Following  bool   `json:"following"`
+	FollowedBy bool   `json:"followed_by"`
+}
+
+// Relationship represents a pair of Twitter users' relationship with each other
+type Relationship struct {
+	Target RelationshipTarget `json:"target"`
+	Source RelationshipTarget `json:"source"`
+}
+
+// Friendship represents a relationship between two Twitter users
+type Friendship struct {
+	Relationship Relationship `json:"relationship"`
+}
+
+type FriendshipLookup struct {
+	Name        string   `json:"name"`
+	ScreenName  string   `json:"screen_name"`
+	ID          int64    `json:"id"`
+	IDStr       string   `json:"id_str"`
+	Connections []string `json:"connections"`
+}
