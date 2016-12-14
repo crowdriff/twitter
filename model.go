@@ -303,10 +303,33 @@ type Friendship struct {
 	Relationship Relationship `json:"relationship"`
 }
 
+// FriendshipLookup represents a Twitter user's relationship to currently authorized user
 type FriendshipLookup struct {
 	Name        string   `json:"name"`
 	ScreenName  string   `json:"screen_name"`
 	ID          int64    `json:"id"`
 	IDStr       string   `json:"id_str"`
 	Connections []string `json:"connections"`
+}
+
+// Image represents info on a Twitter image
+type Image struct {
+	ImageType string `json:"image_type"`
+	W         int    `json:"w"`
+	H         int    `json:"h"`
+}
+
+// Video represents info on a Twitter video
+type Video struct {
+	VideoType string `json:"video_type"`
+}
+
+// MediaUpload represents a Twitter's response object for media upload
+type MediaUpload struct {
+	MediaID          int64  `json:"media_id"`
+	MediaIDString    string `json:"media_id_string"`
+	Size             int    `json:"size"`
+	ExpiresAfterSecs int    `json:"expires_after_secs"`
+	Image            Image  `json:"image"`
+	Video            Video  `json:"video"`
 }

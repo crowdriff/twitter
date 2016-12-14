@@ -49,14 +49,8 @@ func (c *Client) WithGzipDisabled() *Client {
 	return &newC
 }
 
-// do implements the OAuthClient interface. It is used to make an OAuth HTTP
-// request with the provided context, HTTP method, OAuth credentials, URL
-// string, and URL query parameters. It returns the corresponding HTTP response
-// or error.
-func (c *Client) do(ctx context.Context, method string, urlStr string, values url.Values) (*http.Response, error) {
-	// Set credentials.
-	accessCreds := c.accessCredentials(ctx)
-
+// do readies the request body/query url for simple queries and calls execute
+func (c *Client) do(ctx context.Context, method, urlStr string, values url.Values) (*http.Response, error) {
 	// Set up request URL and body.
 	var body io.Reader
 	switch method {
@@ -67,22 +61,31 @@ func (c *Client) do(ctx context.Context, method string, urlStr string, values ur
 		body = strings.NewReader(values.Encode())
 	}
 
-	// Create HTTP request.
+	return c.execute(ctx, method, urlStr, "application/x-www-form-urlencoded", body, values)
+}
+
+// execute implements the OAuthClient interface. It is used to make an OAuth HTTP
+// request with the provided context, HTTP method, body ioReader, OAuth credentials, URL
+// string, and URL query parameters. It returns the corresponding HTTP response
+// or error.
+func (c *Client) execute(ctx context.Context, method, urlStr, contentType string, body io.Reader, values url.Values) (*http.Response, error) {
+	accessCreds := c.accessCredentials(ctx)
+
 	req, err := http.NewRequest(method, urlStr, body)
 	if err != nil {
 		return nil, err
 	}
 	req = req.WithContext(ctx)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	req.Header.Set("Content-Type", contentType)
 	if !c.gzipDisabled {
 		req.Header.Set("Accept-Encoding", "gzip")
 	}
-	err = c.oauthClient.SetAuthorizationHeader(req.Header, accessCreds, method, req.URL, values)
+	err = c.oauthClient.SetAuthorizationHeader(req.Header, accessCreds, req.Method, req.URL, values)
 	if err != nil {
 		return nil, err
 	}
 
-	// Make request.
 	resp, err := c.httpClient.Do(req)
 	if c.gzipDisabled || err != nil || !isGzipped(resp.Header) {
 		return resp, err

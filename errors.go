@@ -45,12 +45,14 @@ func (e *Errors) Error() string {
 }
 
 func checkResponse(resp *http.Response) error {
-	if resp.StatusCode == 200 {
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		return nil
 	}
+
 	errs := Errors{
 		HTTPCode: resp.StatusCode,
 	}
+
 	_ = json.NewDecoder(resp.Body).Decode(&errs)
 	return &errs
 }

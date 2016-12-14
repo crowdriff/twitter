@@ -3,6 +3,7 @@ package twitter
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/url"
 )
 
@@ -100,6 +101,12 @@ type FriendshipResponse struct {
 type FriendshipLookupResponse struct {
 	RateLimit        RateLimit
 	FriendshipLookup []FriendshipLookup
+}
+
+// MediaUploadResponse represents a response from Twitter after media is uploaded
+type MediaUploadResponse struct {
+	RateLimit RateLimit
+	Media     MediaUpload
 }
 
 func (c *Client) handleTweetsResponse(ctx context.Context, method, urlStr string, values url.Values) (*TweetsResponse, error) {
@@ -239,5 +246,30 @@ func (c *Client) handleFriendshipsResponse(ctx context.Context, method, urlStr s
 	return &FriendshipLookupResponse{
 		RateLimit:        getRateLimit(resp.Header),
 		FriendshipLookup: friendshipLookup,
+	}, nil
+}
+
+func (c *Client) handleMediaUpload(ctx context.Context, method, urlStr string, query mediaUploadQueryResponse) (*MediaUploadResponse, error) {
+	resp, err := c.execute(ctx, method, urlStr, query.ContentType, query.Body, nil)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+
+	var mediaUpload MediaUpload
+
+	err = json.NewDecoder(resp.Body).Decode(&mediaUpload)
+	// APPEND response has no body, error will return io.EOF error that should be ignored
+	if err != nil && err != io.EOF {
+		return nil, err
+	}
+
+	return &MediaUploadResponse{
+		RateLimit: getRateLimit(resp.Header),
+		Media:     mediaUpload,
 	}, nil
 }
