@@ -2,10 +2,9 @@ package twitter
 
 import (
 	"context"
+	"io/ioutil"
 	"net/http"
 	"strings"
-
-	"io/ioutil"
 
 	"github.com/garyburd/go-oauth/oauth"
 	. "github.com/onsi/ginkgo"

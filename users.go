@@ -12,7 +12,7 @@ type SearchUsersParams struct {
 	Q               string
 	Page            int
 	Count           int
-	IncludeEntities bool
+	ExcludeEntities bool
 }
 
 // SearchUsers calls Twitter endpoint /users/search.json
@@ -31,8 +31,8 @@ func searchUsersToQuery(params SearchUsersParams) url.Values {
 	if params.Count != 0 {
 		values.Set("count", strconv.Itoa(params.Count))
 	}
-	if params.IncludeEntities {
-		values.Set("include_entities", "true")
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
 	}
 	return values
 }
@@ -41,7 +41,7 @@ func searchUsersToQuery(params SearchUsersParams) url.Values {
 type ShowUserParams struct {
 	UserID          string
 	ScreenName      string
-	IncludeEntities bool
+	ExcludeEntities bool
 }
 
 // ShowUser calls Twitter endpoint /users/show.json
@@ -56,8 +56,8 @@ func showUserToQuery(params ShowUserParams) url.Values {
 
 	values.Set("user_id", params.UserID)
 	values.Set("screen_name", params.ScreenName)
-	if params.IncludeEntities {
-		values.Set("include_entities", "true")
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
 	}
 
 	return values
@@ -67,7 +67,7 @@ func showUserToQuery(params ShowUserParams) url.Values {
 type LookupUsersParams struct {
 	ScreenName      []string
 	UserID          []string
-	IncludeEntities bool
+	ExcludeEntities bool
 }
 
 // LookupUsers calls Twitter endpoint /users/lookup.json
@@ -85,8 +85,8 @@ func lookupUsersToQuery(params LookupUsersParams) url.Values {
 	if len(params.UserID) > 0 {
 		values.Set("user_id", strings.Join(params.UserID, ","))
 	}
-	if params.IncludeEntities {
-		values.Set("include_entities", "true")
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
 	}
 
 	return values

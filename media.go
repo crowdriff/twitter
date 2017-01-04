@@ -76,14 +76,11 @@ func mediaUploadToQuery(params MediaUploadParameters) (mediaUploadQueryResponse,
 	}
 
 	if len(params.Media) > 0 {
-		media := bytes.NewReader(params.Media)
-
 		part, err := bodyWriter.CreateFormFile("media", "")
 		if err != nil {
 			return queryResponse, err
 		}
-
-		_, err = io.Copy(part, media)
+		_, err = part.Write(params.Media)
 		if err != nil {
 			return queryResponse, err
 		}

@@ -2,9 +2,8 @@ package twitter
 
 import (
 	"context"
-	"net/http"
-
 	"io/ioutil"
+	"net/http"
 	"strings"
 
 	"github.com/garyburd/go-oauth/oauth"
@@ -77,12 +76,11 @@ var _ = Describe("Favorites", func() {
 			ctx := context.Background()
 
 			_, err := client.ListFavorites(ctx, ListFavoritesParams{
-				UserID:          "sumid",
-				ScreenName:      "sumscreenname",
-				Count:           3,
-				SinceID:         "12345",
-				MaxID:           "12346",
-				IncludeEntities: true,
+				UserID:     "sumid",
+				ScreenName: "sumscreenname",
+				Count:      3,
+				SinceID:    "12345",
+				MaxID:      "12346",
 			})
 
 			Ω(err).ShouldNot(HaveOccurred())
@@ -130,7 +128,7 @@ var _ = Describe("Favorites", func() {
 					}
 
 					Ω(req.FormValue("id")).Should(Equal("12345"))
-					Ω(req.FormValue("include_entities")).Should(Equal("true"))
+					Ω(req.FormValue("include_entities")).Should(Equal("false"))
 
 					return r, nil
 				},
@@ -154,7 +152,7 @@ var _ = Describe("Favorites", func() {
 
 			_, err := client.CreateFavorite(ctx, CreateFavoriteParameters{
 				ID:              "12345",
-				IncludeEntities: true,
+				ExcludeEntities: true,
 			})
 
 			Ω(err).ShouldNot(HaveOccurred())
@@ -202,7 +200,7 @@ var _ = Describe("Favorites", func() {
 					}
 
 					Ω(req.FormValue("id")).Should(Equal("12345"))
-					Ω(req.FormValue("include_entities")).Should(Equal("true"))
+					Ω(req.FormValue("include_entities")).Should(Equal("false"))
 
 					return r, nil
 				},
@@ -226,7 +224,7 @@ var _ = Describe("Favorites", func() {
 
 			_, err := client.DestroyFavorite(ctx, DestroyFavoriteParameters{
 				ID:              "12345",
-				IncludeEntities: true,
+				ExcludeEntities: true,
 			})
 
 			Ω(err).ShouldNot(HaveOccurred())

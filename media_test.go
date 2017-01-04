@@ -3,9 +3,8 @@ package twitter
 import (
 	"context"
 	"errors"
-	"net/http"
-
 	"io/ioutil"
+	"net/http"
 	"strings"
 
 	"github.com/garyburd/go-oauth/oauth"

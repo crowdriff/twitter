@@ -55,7 +55,7 @@ var _ = Describe("Users", func() {
 					Ω(req.FormValue("q")).Should(Equal("#crazy"))
 					Ω(req.FormValue("page")).Should(Equal("1"))
 					Ω(req.FormValue("count")).Should(Equal("10"))
-					Ω(req.FormValue("include_entities")).Should(Equal("true"))
+					Ω(req.FormValue("include_entities")).Should(Equal(""))
 
 					return r, nil
 				},
@@ -78,10 +78,9 @@ var _ = Describe("Users", func() {
 			ctx := context.Background()
 
 			_, err := client.SearchUsers(ctx, SearchUsersParams{
-				Q:               "#crazy",
-				Page:            1,
-				Count:           10,
-				IncludeEntities: true,
+				Q:     "#crazy",
+				Page:  1,
+				Count: 10,
 			})
 
 			Ω(err).ShouldNot(HaveOccurred())
@@ -130,7 +129,7 @@ var _ = Describe("Users", func() {
 
 					Ω(req.FormValue("user_id")).Should(Equal("12345"))
 					Ω(req.FormValue("screen_name")).Should(Equal("sumname"))
-					Ω(req.FormValue("include_entities")).Should(Equal("true"))
+					Ω(req.FormValue("include_entities")).Should(Equal("false"))
 
 					return r, nil
 				},
@@ -155,7 +154,7 @@ var _ = Describe("Users", func() {
 			_, err := client.ShowUser(ctx, ShowUserParams{
 				UserID:          "12345",
 				ScreenName:      "sumname",
-				IncludeEntities: true,
+				ExcludeEntities: true,
 			})
 
 			Ω(err).ShouldNot(HaveOccurred())
@@ -205,7 +204,7 @@ var _ = Describe("Users", func() {
 
 					Ω(req.FormValue("user_id")).Should(Equal("12345"))
 					Ω(req.FormValue("screen_name")).Should(Equal("sumname"))
-					Ω(req.FormValue("include_entities")).Should(Equal("true"))
+					Ω(req.FormValue("include_entities")).Should(Equal(""))
 
 					return r, nil
 				},
@@ -228,9 +227,8 @@ var _ = Describe("Users", func() {
 			ctx := context.Background()
 
 			_, err := client.LookupUsers(ctx, LookupUsersParams{
-				UserID:          []string{"12345"},
-				ScreenName:      []string{"sumname"},
-				IncludeEntities: true,
+				UserID:     []string{"12345"},
+				ScreenName: []string{"sumname"},
 			})
 
 			Ω(err).ShouldNot(HaveOccurred())

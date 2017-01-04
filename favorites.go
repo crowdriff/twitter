@@ -9,12 +9,12 @@ import (
 //ListFavoritesParams represents the query parameters for a
 // /favorites/list.json request
 type ListFavoritesParams struct {
-	UserID          string `json:"user_id"`
-	ScreenName      string `json:"screen_name"`
-	Count           int    `json:"count"`
-	SinceID         string `json:"since_id"`
-	MaxID           string `json:"max_id"`
-	IncludeEntities bool   `json:"include_entities"`
+	UserID          string
+	ScreenName      string
+	Count           int
+	SinceID         string
+	MaxID           string
+	ExcludeEntities bool
 }
 
 // ListFavorites calls the Twitter /favorites/list.json endpoint
@@ -41,8 +41,8 @@ func listFavoritesToQuery(params ListFavoritesParams) url.Values {
 	if params.MaxID != "" {
 		values.Set("max_id", params.MaxID)
 	}
-	if params.IncludeEntities {
-		values.Set("include_entities", "true")
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
 	}
 	return values
 }
@@ -50,8 +50,8 @@ func listFavoritesToQuery(params ListFavoritesParams) url.Values {
 //CreateFavoriteParameters represents query parameters for a
 // /favorites/create.json request
 type CreateFavoriteParameters struct {
-	ID              string `json:"id"`
-	IncludeEntities bool   `json:"include_entities"`
+	ID              string
+	ExcludeEntities bool
 }
 
 // CreateFavorite calls the Twitter /favorites/create.json endpoint
@@ -64,8 +64,8 @@ func (c *Client) CreateFavorite(ctx context.Context, params CreateFavoriteParame
 func createFavoriteToQuery(params CreateFavoriteParameters) url.Values {
 	values := url.Values{}
 	values.Set("id", params.ID)
-	if params.IncludeEntities {
-		values.Set("include_entities", "true")
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
 	}
 	return values
 }
@@ -73,8 +73,8 @@ func createFavoriteToQuery(params CreateFavoriteParameters) url.Values {
 //DestroyFavoriteParameters represents query parameters for a
 // /favorites/create.json request
 type DestroyFavoriteParameters struct {
-	ID              string `json:"id"`
-	IncludeEntities bool   `json:"include_entities"`
+	ID              string
+	ExcludeEntities bool
 }
 
 // DestroyFavorite calls the Twitter /favorites/create.json endpoint
@@ -87,8 +87,8 @@ func (c *Client) DestroyFavorite(ctx context.Context, params DestroyFavoritePara
 func destroyFavoriteToQuery(params DestroyFavoriteParameters) url.Values {
 	values := url.Values{}
 	values.Set("id", params.ID)
-	if params.IncludeEntities {
-		values.Set("include_entities", "true")
+	if params.ExcludeEntities {
+		values.Set("include_entities", "false")
 	}
 	return values
 }

@@ -38,7 +38,7 @@ func showFriendshipToQuery(params ShowFriendshipsParameters) url.Values {
 	return values
 }
 
-// LookupFriendsParams represents parameters for /friendships/lookup.json Twitter endpoint
+// LookupFriendshipsParams represents parameters for /friendships/lookup.json Twitter endpoint
 type LookupFriendshipsParams struct {
 	ScreenName []string
 	UserID     []string
