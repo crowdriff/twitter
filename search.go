@@ -23,6 +23,10 @@ type SearchTweetsParams struct {
 	Callback        string
 }
 
+type searchRes struct {
+	Statuses []Tweet `json:"statuses"`
+}
+
 // SearchTweets calls the Twitter /search/tweets.json endpoint.
 func (c *Client) SearchTweets(ctx context.Context, params SearchTweetsParams) (*TweetsResponse, error) {
 	values := searchTweetsToQuery(params)
@@ -34,13 +38,13 @@ func (c *Client) SearchTweets(ctx context.Context, params SearchTweetsParams) (*
 	if err = checkResponse(resp); err != nil {
 		return nil, err
 	}
-	var tweets []Tweet
-	err = json.NewDecoder(resp.Body).Decode(&tweets)
+	var res searchRes
+	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
 		return nil, err
 	}
 	return &TweetsResponse{
-		Tweets:    tweets,
+		Tweets:    res.Statuses,
 		RateLimit: getRateLimit(resp.Header),
 	}, nil
 }
