@@ -9,6 +9,7 @@ type Tweet struct {
 	CreatedAt            string                 `json:"created_at"`
 	Entities             Entities               `json:"entities"`
 	ExtendedEntities     ExtendedEntities       `json:"extended_entities"`
+	ExtendedTweet        *ExtendedTweet         `json:"extended_tweet"`
 	FavoriteCount        int                    `json:"favorite_count"`
 	Favorited            bool                   `json:"favorited"`
 	FilterLevel          string                 `json:"filter_level"`
@@ -36,6 +37,14 @@ type Tweet struct {
 	WithheldCopyright    bool                   `json:"withheld_copyright"`
 	WithheldInCountries  []string               `json:"withheld_in_countries"`
 	WithheldScope        string                 `json:"withheld_scope"`
+}
+
+// ExtendedTweet represents the full information for an extended tweet.
+type ExtendedTweet struct {
+	FullText         string           `json:"full_text"`
+	DisplayTextRange []int            `json:"display_text_range"`
+	Entities         Entities         `json:"entities"`
+	ExtendedEntities ExtendedEntities `json:"extended_entities"`
 }
 
 // Coordinates represents the geographic location of a Tweet as reported by the
