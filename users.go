@@ -53,13 +53,15 @@ func (c *Client) ShowUser(ctx context.Context, params ShowUserParams) (*UserResp
 
 func showUserToQuery(params ShowUserParams) url.Values {
 	values := url.Values{}
-
-	values.Set("user_id", params.UserID)
-	values.Set("screen_name", params.ScreenName)
+	if params.UserID != "" {
+		values.Set("user_id", params.UserID)
+	}
+	if params.ScreenName != "" {
+		values.Set("screen_name", params.ScreenName)
+	}
 	if params.ExcludeEntities {
 		values.Set("include_entities", "false")
 	}
-
 	return values
 }
 
