@@ -10,17 +10,18 @@ import (
 // SearchTweetsParams represents the query parameters for a /search/tweets.json
 // request.
 type SearchTweetsParams struct {
-	Query           string
-	Geocode         string
-	Lang            string
-	Locale          string
-	ResultType      string
-	Count           int
-	Until           string
-	SinceID         string
-	MaxID           string
-	ExcludeEntities bool
-	Callback        string
+	Query            string
+	Geocode          string
+	Lang             string
+	Locale           string
+	ResultType       string
+	Count            int
+	Until            string
+	SinceID          string
+	MaxID            string
+	ExcludeEntities  bool
+	ExtendedEntities bool
+	Callback         string
 }
 
 type searchRes struct {
@@ -78,6 +79,9 @@ func searchTweetsToQuery(params SearchTweetsParams) url.Values {
 	}
 	if params.ExcludeEntities {
 		values.Set("include_entities", "false")
+	}
+	if params.ExtendedEntities {
+		values.Set("tweet_mode", "extended")
 	}
 	if params.Callback != "" {
 		values.Set("callback", params.Callback)

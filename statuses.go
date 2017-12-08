@@ -221,6 +221,7 @@ type ShowTweetParams struct {
 	TrimUser         bool   `json:"trim_user"`
 	IncludeMyRetweet bool   `json:"include_my_retweet"`
 	ExcludeEntities  bool   `json:"exclude_entities"`
+	ExtendedTweet    bool   `json:"extended_tweet"`
 }
 
 // ShowTweet calls the Twitter /statuses/show/:id.json endpoint.
@@ -241,6 +242,9 @@ func showTweetToQuery(params ShowTweetParams) url.Values {
 	}
 	if params.ExcludeEntities {
 		values.Set("include_entities", "false")
+	}
+	if params.ExtendedTweet {
+		values.Set("tweet_mode", "extended")
 	}
 	return values
 }
