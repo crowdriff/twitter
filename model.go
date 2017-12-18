@@ -13,6 +13,7 @@ type Tweet struct {
 	FavoriteCount        int                    `json:"favorite_count"`
 	Favorited            bool                   `json:"favorited"`
 	FilterLevel          string                 `json:"filter_level"`
+	FullText             string                 `json:"full_text"`
 	ID                   int64                  `json:"id"`
 	IDStr                string                 `json:"id_str"`
 	InReplyToScreenName  string                 `json:"in_reply_to_screen_name"`
