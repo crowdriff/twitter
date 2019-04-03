@@ -2,7 +2,7 @@ language: go
 
 go:
   - 1.11
-  - tip
+  - master
 
 install:
   - make tools
