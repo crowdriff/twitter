@@ -1,12 +1,11 @@
 language: go
 
+env:
+  - GO111MODULE=off
+
 go:
   - 1.11
-  - tip
-
-before_intall:
-  - go get github.com/crowdriff/twitter
-  - go get github.com/tools/godep
+  - master
 
 install:
   - make tools
