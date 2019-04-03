@@ -31,6 +31,6 @@ test:
 	@ginkgo -r -cover -race
 
 tools:
-	go get github.com/golang/lint/golint
+	go get golang.org/x/lint/golint
 	go get github.com/onsi/ginkgo/ginkgo
 	go get github.com/onsi/gomega
