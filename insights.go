@@ -53,6 +53,10 @@ func insightsToQuery(params PostInsightsParams) (getInsightsQueryResponse, error
 
 	buf := &bytes.Buffer{}
 	_, err = buf.Write(b)
+	if err != nil {
+		return queryResp, err
+	}
+
 	queryResp.Body = buf
 	queryResp.ContentType = "application/json"
 

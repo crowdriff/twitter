@@ -349,7 +349,7 @@ type MediaInsights struct {
 	Favourites  string `json:"favorites"`
 	Replies     string `json:"replies"`
 	Retweets    string `json:"retweets"`
-	VideoViews  string `json:"expires_after_secs"`
+	VideoViews  string `json:"video_views"`
 	Impressions string `json:"impressions"`
 	Engagements string `json:"engagements"`
 }

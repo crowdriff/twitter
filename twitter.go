@@ -282,10 +282,10 @@ func (c *Client) handleMediaUpload(ctx context.Context, method, urlStr string, q
 
 func (c *Client) handleGetInsights(ctx context.Context, method, urlStr string, query getInsightsQueryResponse) (*PostInsightsResponse, error) {
 	resp, err := c.execute(ctx, method, urlStr, query.ContentType, query.Body, nil)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	if err = checkResponse(resp); err != nil {
 		return nil, err
@@ -293,7 +293,7 @@ func (c *Client) handleGetInsights(ctx context.Context, method, urlStr string, q
 
 	var insightsResp MediaInsights
 	err = json.NewDecoder(resp.Body).Decode(&insightsResp)
-	if err != nil && err != io.EOF {
+	if err != nil {
 		return nil, err
 	}
 
