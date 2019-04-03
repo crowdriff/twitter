@@ -1,4 +1,4 @@
-version=0.2.1
+version=0.2.2
 
 .PHONY: all
 
@@ -31,6 +31,6 @@ test:
 	@ginkgo -r -cover -race
 
 tools:
-	go get github.com/golang/lint/golint
+	go get golang.org/x/lint/golint
 	go get github.com/onsi/ginkgo/ginkgo
 	go get github.com/onsi/gomega

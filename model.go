@@ -343,3 +343,13 @@ type MediaUpload struct {
 	Image            Image  `json:"image"`
 	Video            Video  `json:"video"`
 }
+
+// MediaInsights represents a Twitter's response object for a call to their insights API.
+type MediaInsights struct {
+	Favourites  string `json:"favorites"`
+	Replies     string `json:"replies"`
+	Retweets    string `json:"retweets"`
+	VideoViews  string `json:"video_views"`
+	Impressions string `json:"impressions"`
+	Engagements string `json:"engagements"`
+}

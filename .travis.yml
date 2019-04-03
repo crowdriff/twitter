@@ -1,8 +1,11 @@
 language: go
 
+env:
+  - GO111MODULE=off
+
 go:
-  - 1.7.1
-  - tip
+  - 1.11
+  - master
 
 install:
   - make tools
