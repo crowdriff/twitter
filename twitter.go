@@ -109,6 +109,12 @@ type MediaUploadResponse struct {
 	Media     MediaUpload
 }
 
+//PostInsightsResponse represents a aresponse from Twitter to retrieve insights for a given tween
+type PostInsightsResponse struct {
+	RateLimit RateLimit
+	Insights  MediaInsights
+}
+
 func (c *Client) handleTweetsResponse(ctx context.Context, method, urlStr string, values url.Values) (*TweetsResponse, error) {
 	resp, err := c.do(ctx, method, urlStr, values)
 	if err != nil {
@@ -271,5 +277,28 @@ func (c *Client) handleMediaUpload(ctx context.Context, method, urlStr string, q
 	return &MediaUploadResponse{
 		RateLimit: getRateLimit(resp.Header),
 		Media:     mediaUpload,
+	}, nil
+}
+
+func (c *Client) handleGetInsights(ctx context.Context, method, urlStr string, query getInsightsQueryResponse) (*PostInsightsResponse, error) {
+	resp, err := c.execute(ctx, method, urlStr, query.ContentType, query.Body, nil)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	if err = checkResponse(resp); err != nil {
+		return nil, err
+	}
+
+	var insightsResp MediaInsights
+	err = json.NewDecoder(resp.Body).Decode(&insightsResp)
+	if err != nil && err != io.EOF {
+		return nil, err
+	}
+
+	return &PostInsightsResponse{
+		RateLimit: getRateLimit(resp.Header),
+		Insights:  insightsResp,
 	}, nil
 }
