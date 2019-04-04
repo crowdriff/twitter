@@ -344,7 +344,13 @@ type MediaUpload struct {
 	Video            Video  `json:"video"`
 }
 
-// MediaInsights represents a Twitter's response object for a call to their insights API.
+// InsightsData represents the object that wraps the response from Twitter's Insights API.
+type InsightsData map[string]TweetIDs
+
+//TweetIDs represents a subset of the return object for the Twitter Insights API.
+type TweetIDs map[string]MediaInsights
+
+// MediaInsights represents the smallest piece of Twitter's response object for a call to their insights API.
 type MediaInsights struct {
 	Favourites  string `json:"favorites"`
 	Replies     string `json:"replies"`

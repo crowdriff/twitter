@@ -109,10 +109,10 @@ type MediaUploadResponse struct {
 	Media     MediaUpload
 }
 
-//PostInsightsResponse represents a aresponse from Twitter to retrieve insights for a given tween
+//PostInsightsResponse represents a response from Twitter to retrieve insights for a given tween
 type PostInsightsResponse struct {
 	RateLimit RateLimit
-	Insights  MediaInsights
+	Insights  InsightsData
 }
 
 func (c *Client) handleTweetsResponse(ctx context.Context, method, urlStr string, values url.Values) (*TweetsResponse, error) {
@@ -291,7 +291,7 @@ func (c *Client) handleGetInsights(ctx context.Context, method, urlStr string, q
 		return nil, err
 	}
 
-	var insightsResp MediaInsights
+	var insightsResp InsightsData
 	err = json.NewDecoder(resp.Body).Decode(&insightsResp)
 	if err != nil {
 		return nil, err

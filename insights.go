@@ -21,9 +21,18 @@ type getInsightsQueryResponse struct {
 type insightsBody struct {
 	TweetIDs        []string `json:"tweet_ids"`
 	EngagementTypes []string `json:"engagement_types"`
+	Groupings       groupBy  `json:"groupings"`
+}
+
+type groupBy struct {
+	Data struct {
+		GroupBy []string `json:"group_by"`
+	} `json:"data"`
 }
 
 var engagements = []string{"impressions", "engagements", "favorites", "retweets", "video_views", "replies"}
+
+var groupings = []string{"tweet.id", "engagement.type"}
 
 //GetTotalPostInsights calls the twitter data api and retrieves insight totals (lifetime metrics) for up to 250 post ids
 // Posts older than 90 days cannot be queried using this endpoint
@@ -45,6 +54,13 @@ func insightsToQuery(params PostInsightsParams) (getInsightsQueryResponse, error
 	body := insightsBody{
 		EngagementTypes: engagements,
 		TweetIDs:        params.PostIDs,
+		Groupings: groupBy{
+			Data: struct {
+				GroupBy []string `json:"group_by"`
+			}{
+				GroupBy: groupings,
+			},
+		},
 	}
 	b, err := json.Marshal(&body)
 	if err != nil {
