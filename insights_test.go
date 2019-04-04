@@ -51,7 +51,12 @@ var _ = Describe("Insights", func() {
 				DoFn: func(req *http.Request) (*http.Response, error) {
 					r := &http.Response{
 						StatusCode: 200,
-						Body:       ioutil.NopCloser(strings.NewReader(`{"replies": "12", "favorites": "11"}`)),
+						Body: ioutil.NopCloser(strings.NewReader(`{
+							"data": {
+								"232323": {"replies": "12", "favorites": "11"},
+								"7767": {"retweets": "0"}
+								}
+							}`)),
 					}
 					return r, nil
 				},
@@ -72,16 +77,25 @@ var _ = Describe("Insights", func() {
 
 			ctx := context.Background()
 			params := PostInsightsParams{
-				PostIDs: []string{"1212"},
+				PostIDs: []string{"232323", "7767"},
 			}
 
 			resp, err := c.GetTotalPostInsights(ctx, params)
-			expResp := MediaInsights{
-				Favourites: "11",
-				Replies:    "12",
+			tweetID := TweetIDs{
+				"232323": MediaInsights{
+					Favourites: "11",
+					Replies:    "12",
+				},
+				"7767": MediaInsights{
+					Retweets: "0",
+				},
 			}
+			d := InsightsData{
+				"data": tweetID,
+			}
+
 			Ω(err).ShouldNot(HaveOccurred())
-			Ω(resp.Insights).Should(Equal(expResp))
+			Ω(resp.Insights).Should(Equal(d))
 		})
 	})
 })
